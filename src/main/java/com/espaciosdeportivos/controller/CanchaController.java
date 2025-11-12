@@ -52,7 +52,7 @@ public class CanchaController {
         return ResponseEntity.ok(lista);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/porid/{id}")
     public ResponseEntity<CanchaDTO> obtenerCanchaPorId(@PathVariable Long id) {
         logger.info("[CANCHA] Inicio obtenerCanchaPorId: {}", id);
         CanchaDTO dto = canchaService.obtenerCanchaPorId(id);

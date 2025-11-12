@@ -61,25 +61,34 @@ public class SecurityConfig {
             .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+
+                //RUTAS PUBLICAS (Sinlogin)
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/areasdeportivas/**").permitAll()//validar mejor es que yo necesito las ctivas y listar areas deportivas por id eso necsito
+                .requestMatchers("/api/cancha/area/**").permitAll()
+                .requestMatchers("/api/cancha/porid/**").permitAll() //ojito cambie ladirecion de id
+
                 .requestMatchers("/img/**").permitAll() // 
 
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                //rutas restringidas por rol
 
                 // Rutas exclusivas para SUPERUSUARIO
+                .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
                 //.requestMatchers("/api/**").hasRole("SUPERUSUARIO")
                 .requestMatchers("/api/super/**").hasRole("SUPERUSUARIO")
                 .requestMatchers("/api/cancha/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")   
                 .requestMatchers("/api/admin/**").hasRole("SUPERUSUARIO")
-                .requestMatchers("/api/areasdeportivas/**").hasRole("SUPERUSUARIO")
+                
 
 
                 // Rutas para SUPERUSUARIO y ADMINISTRADOR
                 .requestMatchers("/api/admin/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
                 .requestMatchers("/api/administradores/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
-                .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
+                //.requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR" )
                 .requestMatchers("api/disciplina/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
+                
                 //RUTAS para ADMINISTRADOR
                 .requestMatchers("/api/cancha/area/**").hasRole("ADMINISTRADOR") // Solo admins pueden ver canchas por área                .requestMatchers("/api/supervisa/**").hasAnyRole("ADMINISTRADOR") //k
                 .requestMatchers("/api/supervisa/**").hasRole("ADMINISTRADOR") //solo administrador puede supervisar sus canchas y usuarios
