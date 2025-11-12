@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 //import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -56,8 +57,14 @@ public class Persona {
     ///@NotNull
     @Column(name = "estado", nullable = false)
     private Boolean estado;
+
     //use Lazi por que Solo carga esta relación cuando yo la pida explícitamente en el código."
     @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
     private List<Comentario> comentario;
+
+    //aqui agregue qr
+    @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Qr> qrs;
 
 }
