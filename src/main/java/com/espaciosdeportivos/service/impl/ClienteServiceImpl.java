@@ -95,11 +95,11 @@ public class ClienteServiceImpl implements ClienteService {
         if (dto.getNombre() != null) {
             cliente.setNombre(dto.getNombre());
         }
-        if (dto.getAPaterno() != null) {
-            cliente.setApellidoPaterno(dto.getAPaterno());
+        if (dto.getApellidoPaterno() != null) {
+            cliente.setApellidoPaterno(dto.getApellidoPaterno());
         }
-        if (dto.getAMaterno() != null) {
-            cliente.setApellidoMaterno(dto.getAMaterno());
+        if (dto.getApellidoMaterno() != null) {
+            cliente.setApellidoMaterno(dto.getApellidoMaterno());
         }
         if (dto.getFechaNacimiento() != null) {
             cliente.setFechaNacimiento(dto.getFechaNacimiento());
@@ -153,6 +153,7 @@ public class ClienteServiceImpl implements ClienteService {
     // --- Métodos privados de mapeo ---
     
     private ClienteDTO mapToDTO(Cliente cliente) {
+        
         if (cliente == null) {
             return null;
         }
@@ -160,8 +161,8 @@ public class ClienteServiceImpl implements ClienteService {
         return ClienteDTO.builder()
                 .id(cliente.getId())
                 .nombre(cliente.getNombre())
-                .aPaterno(cliente.getApellidoPaterno())
-                .aMaterno(cliente.getApellidoMaterno())
+                .apellidoPaterno(cliente.getApellidoPaterno())
+                .apellidoMaterno(cliente.getApellidoMaterno())
                 .fechaNacimiento(cliente.getFechaNacimiento())
                 .telefono(cliente.getTelefono()) 
                 .email(cliente.getEmail())
@@ -169,6 +170,8 @@ public class ClienteServiceImpl implements ClienteService {
                 .estado(cliente.getEstado())
                 .categoria(cliente.getCategoria())
                 .build();
+            //  -> Entidad
+
     }
 
     private Cliente mapToEntity(ClienteDTO dto) {
@@ -182,8 +185,8 @@ public class ClienteServiceImpl implements ClienteService {
         // Establecer campos de Persona
         cliente.setId(dto.getId()); // Puede ser null para creación nueva
         cliente.setNombre(dto.getNombre());
-        cliente.setApellidoPaterno(dto.getAPaterno());
-        cliente.setApellidoMaterno(dto.getAMaterno());
+        cliente.setApellidoPaterno(dto.getApellidoPaterno());
+        cliente.setApellidoMaterno(dto.getApellidoMaterno());
         cliente.setFechaNacimiento(dto.getFechaNacimiento());
         cliente.setTelefono(dto.getTelefono());
         cliente.setEmail(dto.getEmail());

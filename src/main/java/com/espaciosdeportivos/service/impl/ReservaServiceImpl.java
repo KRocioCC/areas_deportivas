@@ -489,8 +489,8 @@ public class ReservaServiceImpl implements IReservaService {
         return ClienteDTO.builder()
                 .id(cliente.getId())
                 .nombre(cliente.getNombre())
-                .aPaterno(cliente.getApellidoPaterno()) // corregido
-                .aMaterno(cliente.getApellidoMaterno())
+                .apellidoPaterno(cliente.getApellidoPaterno()) // corregido
+                .apellidoMaterno(cliente.getApellidoMaterno())
                 .email(cliente.getEmail())
                 .telefono(cliente.getTelefono())
                 .categoria(cliente.getCategoria())
