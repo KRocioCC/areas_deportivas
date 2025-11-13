@@ -61,5 +61,8 @@ public interface IReservaService {
 
     //ReservaDTO crearReserva(ReservaDTO dto);
     ReservaDTO actualizarEstadoPagoReserva(Long idReserva);
+
+    // Reservas por administrador en rango de fechas
+    List<ReservaDTO> buscarPorAdministradorEnRango(Long idAdministrador, LocalDate inicio, LocalDate fin);
    
 }

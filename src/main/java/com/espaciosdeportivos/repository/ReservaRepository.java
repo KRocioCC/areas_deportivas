@@ -102,4 +102,21 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
               """)
               List<Cliente> findClientesByAdministrador(@Param("idAdmin") Long idAdmin);
 
+       //Obtener todas las reservas asociadas a canchas de áreas deportivas
+       // de un administrador específico K
+       @Query("""
+    SELECT DISTINCT r
+       FROM Reserva r
+       JOIN Incluye i ON i.reserva = r
+       JOIN Cancha c ON i.cancha = c
+       JOIN AreaDeportiva ad ON c.areaDeportiva = ad
+       WHERE ad.administrador.id = :idAdministrador
+       AND r.fechaReserva BETWEEN :inicio AND :fin
+       """)
+       List<Reserva> findByAdministradorIdAndRangoFechas(
+              @Param("idAdministrador") Long idAdministrador,
+              @Param("inicio") LocalDate inicio,
+              @Param("fin") LocalDate fin);
+
+
 }

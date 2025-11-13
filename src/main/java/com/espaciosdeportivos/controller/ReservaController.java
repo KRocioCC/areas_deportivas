@@ -203,4 +203,17 @@ public class ReservaController {
         ReservaDTO reservaConfirmada = reservaService.confirmarReserva(id);
         return ResponseEntity.ok(reservaConfirmada);
     }*/
+
+    // RESERVAS POR ADMINISTRADOR EN RANGO DE FECHAS
+    //PAra administrador ver sus reservas en rango de fechas k
+    @GetMapping("/administrador/{idAdministrador}/rango-fechas")
+    public ResponseEntity<List<ReservaDTO>> buscarPorAdministradorEnRango(
+            @PathVariable Long idAdministrador,
+            @RequestParam String inicio,
+            @RequestParam String fin) {
+        List<ReservaDTO> reservas = reservaService.buscarPorAdministradorEnRango(
+                idAdministrador, LocalDate.parse(inicio), LocalDate.parse(fin));
+        return ResponseEntity.ok(reservas);
+    }
+
 }

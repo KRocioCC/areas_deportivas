@@ -339,6 +339,17 @@ public class ReservaServiceImpl implements IReservaService {
                 .collect(Collectors.toList());
     }
 
+    // Reservas por administrador en rango de fechas
+    // para que el administrador vea las reservas de sus canchas en un rango de fechas K
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> buscarPorAdministradorEnRango(Long idAdministrador, LocalDate inicio, LocalDate fin) {
+        List<Reserva> reservas = reservaRepository.findByAdministradorIdAndRangoFechas(idAdministrador, inicio, fin);
+        return reservas.stream()
+                .map(this::convertToDTO) // 
+                .collect(Collectors.toList());
+    }
+
 
     // ======================
     // MAPEO
