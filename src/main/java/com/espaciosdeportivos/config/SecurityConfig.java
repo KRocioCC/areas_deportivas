@@ -67,6 +67,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/areasdeportivas/**").permitAll()//validar mejor es que yo necesito las ctivas y listar areas deportivas por id eso necsito
                 .requestMatchers("/api/cancha/area/**").permitAll()
                 .requestMatchers("/api/cancha/porid/**").permitAll() //ojito cambie ladirecion de id
+                .requestMatchers("/api/cancha/equipamientos/**").permitAll()
+                .requestMatchers("/api/cancha/disciplinas/**").permitAll()
+                .requestMatchers("/api/cancha/disciplinas/**").permitAll()
+                .requestMatchers("/api/disciplina/porid/**").permitAll()
+                .requestMatchers("/api/disciplina/activos").permitAll()
 
                 .requestMatchers("/img/**").permitAll() // 
 

@@ -45,7 +45,7 @@ public class DisciplinaController {
     }
 
     
-    @GetMapping("/{idDisciplina}")
+    @GetMapping("/porid/{idDisciplina}")
     public ResponseEntity<DisciplinaDTO> obtenerDisciplina(@PathVariable Long idDisciplina) {
         log.info("GET /api/disciplinas/{}", idDisciplina);
         
