@@ -71,8 +71,8 @@ public class SecurityConfig {
                 //.requestMatchers("/api/**").hasRole("SUPERUSUARIO")
                 .requestMatchers("/api/super/**").hasRole("SUPERUSUARIO")
                 .requestMatchers("/api/cancha/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")   
-                .requestMatchers("/api/admin/**").hasRole("SUPERUSUARIO")
-                .requestMatchers("/api/areasdeportivas/**").hasRole("SUPERUSUARIO")
+                //.requestMatchers("/api/admin/**").hasRole("SUPERUSUARIO") ESTO DEJENLO COMENTADO!
+                //.requestMatchers("/api/areasdeportivas/**").hasRole("SUPERUSUARIO")
 
 
                 // Rutas para SUPERUSUARIO y ADMINISTRADOR
