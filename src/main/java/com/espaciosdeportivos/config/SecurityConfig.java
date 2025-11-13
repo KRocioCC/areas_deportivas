@@ -62,7 +62,7 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
 
-                //RUTAS PUBLICAS (Sinlogin)
+                //RUTAS PUBLICAS (Sinlogin Sara)
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/areasdeportivas/**").permitAll()//validar mejor es que yo necesito las ctivas y listar areas deportivas por id eso necsito
                 .requestMatchers("/api/cancha/area/**").permitAll()
