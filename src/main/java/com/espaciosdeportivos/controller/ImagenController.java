@@ -2,13 +2,14 @@ package com.espaciosdeportivos.controller;
 
 import com.espaciosdeportivos.dto.ImagenDTO;
 import com.espaciosdeportivos.service.ImagenService;
+import com.espaciosdeportivos.service.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-//import org.springframework.core.io.Resource;
-//import org.springframework.http.HttpHeaders;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import java.util.List;
 public class ImagenController {
 
     private final ImagenService imagenService;
+    private final FileStorageService fileStorageService;
 
     @Operation(summary = "Subir imágenes para una entidad", description = "Sube una o múltiples imágenes y las asocia a una entidad específica")
     @PostMapping(value = "/subir/{entidadTipo}/{entidadId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -66,30 +68,59 @@ public class ImagenController {
         }
     }
 
-   /* @Operation(summary = "Descargar archivo de imagen", description = "Descarga el archivo físico de una imagen por su ruta de almacenamiento")
+    @Operation(summary = "Servir archivo de imagen", description = "Sirve el archivo físico de una imagen por su ruta de almacenamiento")
     @GetMapping("/archivo/{rutaArchivo:.+}")
-    public ResponseEntity<Resource> descargarArchivo(
+    public ResponseEntity<Resource> servirArchivoImagen(
             @Parameter(description = "Ruta completa del archivo") 
             @PathVariable String rutaArchivo) {
         
-        log.info("Descargando archivo: {}", rutaArchivo);
+        log.info("Sirviendo imagen: {}", rutaArchivo);
         
         try {
-            //CREAR METODO EN IMAGENSERVICE
-            Resource resource = imagenService.cargarArchivo(rutaArchivo);
+            Resource resource = fileStorageService.cargarArchivo(rutaArchivo);
             
-            String contentType = "application/octet-stream";
-            String filename = rutaArchivo.substring(rutaArchivo.lastIndexOf("/") + 1);
+            // Verificar que el archivo existe y es legible
+            if (!resource.exists() || !resource.isReadable()) {
+                log.warn("Imagen no encontrada o no legible: {}", rutaArchivo);
+                return ResponseEntity.notFound().build();
+            }
+            
+            // Determinar el tipo de contenido basado en la extensión del archivo
+            String contentType = determinarTipoContenido(rutaArchivo);
+            String filename = resource.getFilename();
+            
+            log.info("Imagen servida exitosamente: {} - Tipo: {}", rutaArchivo, contentType);
             
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
                     .body(resource);
         } catch (Exception e) {
-            log.error("Error descargando archivo: {}", e.getMessage());
+            log.error("Error sirviendo imagen {}: {}", rutaArchivo, e.getMessage());
             return ResponseEntity.notFound().build();
         }
-    }*/
+    }
+
+    // Método auxiliar para determinar el tipo de contenido
+    private String determinarTipoContenido(String rutaArchivo) {
+        String fileName = rutaArchivo.toLowerCase();
+        
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+            return "image/jpeg";
+        } else if (fileName.endsWith(".png")) {
+            return "image/png";
+        } else if (fileName.endsWith(".gif")) {
+            return "image/gif";
+        } else if (fileName.endsWith(".webp")) {
+            return "image/webp";
+        } else if (fileName.endsWith(".bmp")) {
+            return "image/bmp";
+        } else if (fileName.endsWith(".svg")) {
+            return "image/svg+xml";
+        } else {
+            return "application/octet-stream";
+        }
+    }
 
     @Operation(summary = "Eliminar imagen (lógico)", description = "Desactiva una imagen pero mantiene el archivo físico y el registro")
     @DeleteMapping("/logico/{idImagenRelacion}")

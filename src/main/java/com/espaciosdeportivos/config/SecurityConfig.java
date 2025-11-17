@@ -73,14 +73,19 @@ public class SecurityConfig {
                 .requestMatchers("/api/disciplina/porid/**").permitAll()
                 .requestMatchers("/api/disciplina/activos").permitAll()
 
-                .requestMatchers("/img/**").permitAll() // 
+                // RUTAS PÚBLICAS PARA ARCHIVOS E IMÁGENES
+                .requestMatchers("/img/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
+                .requestMatchers("/api/archivos/**").permitAll()
+                .requestMatchers("/api/imagenes/archivo/**").permitAll() // Para servir imágenes
+                .requestMatchers("/api/imagenes/entidad/**").permitAll() // Para obtener imágenes de entidad
 
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 //rutas restringidas por rol
 
                 // Rutas exclusivas para SUPERUSUARIO
-                .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
+                .requestMatchers("/api/areasdep ortivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
                 //.requestMatchers("/api/**").hasRole("SUPERUSUARIO")
                 .requestMatchers("/api/super/**").hasRole("SUPERUSUARIO")
                 .requestMatchers("/api/cancha/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")   
