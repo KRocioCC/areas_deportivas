@@ -3,6 +3,7 @@ package com.espaciosdeportivos.dto;
 //import com.espaciosdeportivos.model.Reserva;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -19,8 +20,9 @@ public class ReservaDTO implements Serializable {
 
     private Long idReserva;
 
-    @NotNull(message = "La fecha de creación es obligatoria")
-    @PastOrPresent(message = "La fecha de creación no puede ser futura")
+    //@NotNull(message = "La fecha de creación es obligatoria")
+    //@PastOrPresent(message = "La fecha de creación no puede ser futura")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime fechaCreacion;
 
     @NotNull(message = "La fecha de la reserva es obligatoria")

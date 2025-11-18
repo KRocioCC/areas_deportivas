@@ -25,7 +25,7 @@ public class Reserva {
     private Long idReserva;
 
     @CreationTimestamp
-    @Column(name = "fecha_creacion", nullable = false, updatable = false)
+    @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
     @Column(name = "fecha_reserva", nullable = false)
