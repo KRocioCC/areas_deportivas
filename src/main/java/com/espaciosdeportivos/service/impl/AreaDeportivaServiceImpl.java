@@ -31,6 +31,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -302,11 +304,16 @@ public class AreaDeportivaServiceImpl implements IAreaDeportivaService {
     }
 
     @Override
-    public AreaDeportivaDTO obtenerPorAdminId(Long Id) {
-        AreaDeportiva area = areaDeportivaRepository.findByAdministrador_Id(Id)
-            .orElseThrow(() -> new RuntimeException("Área no encontrada para el administrador"));
-        return convertToDTO(area);
+   public AreaDeportivaDTO obtenerPorAdminId(Long id) {
+    Optional<AreaDeportiva> areaOpt = areaDeportivaRepository.findByAdministrador_Id(id);
+
+    if (areaOpt.isEmpty()) {
+        return null; //  devolvemos null para que el controlador maneje el 404
     }
+
+    return convertToDTO(areaOpt.get());
+}
+
 
     //MI_AREA k actualizar por adminId   
     //Comentario : "rocio cambien las fechas ya no sons tring espero que no te afecte mucho perdon"

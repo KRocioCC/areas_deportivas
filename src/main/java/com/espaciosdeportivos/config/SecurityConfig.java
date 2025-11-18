@@ -64,7 +64,7 @@ public class SecurityConfig {
 
                 //RUTAS PUBLICAS (Sinlogin Sara)
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/areasdeportivas/**").permitAll()//validar mejor es que yo necesito las ctivas y listar areas deportivas por id eso necsito
+                //.requestMatchers("/api/areasdeportivas/**").permitAll()//validar mejor es que yo necesito las ctivas y listar areas deportivas por id eso necsito
                 .requestMatchers("/api/cancha/area/**").permitAll()
                 .requestMatchers("/api/cancha/porid/**").permitAll() //ojito cambie ladirecion de id
                 .requestMatchers("/api/cancha/equipamientos/**").permitAll()
@@ -80,10 +80,10 @@ public class SecurityConfig {
                 //rutas restringidas por rol
 
                 // Rutas exclusivas para SUPERUSUARIO
-                .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
+                .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
                 //.requestMatchers("/api/**").hasRole("SUPERUSUARIO")
                 .requestMatchers("/api/super/**").hasRole("SUPERUSUARIO")
-                .requestMatchers("/api/cancha/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")   
+                //.requestMatchers("/api/cancha/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")   
                 //.requestMatchers("/api/admin/**").hasRole("SUPERUSUARIO") ESTO DEJENLO COMENTADO!
                 //.requestMatchers("/api/areasdeportivas/**").hasRole("SUPERUSUARIO")
 
@@ -98,9 +98,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/cancha/area/**").hasRole("ADMINISTRADOR") // Solo admins pueden ver canchas por área                .requestMatchers("/api/supervisa/**").hasAnyRole("ADMINISTRADOR") //k
                 .requestMatchers("/api/supervisa/**").hasRole("ADMINISTRADOR") //solo administrador puede supervisar sus canchas y usuarios               
                 .requestMatchers("/api/usuario_control/**").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO") //solo admins pueden gestionar sus usuarios de control
-                //.requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR","CLIENTE") // admins pueden gestionar incluye 
-                //RUTAS por CLIENTES
-                
+                .requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE") // admins pueden gestionar incluye
 
                 // Rutas que incluyen clientes
                 //.requestMatchers("/api/clientes", "/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")

@@ -102,11 +102,14 @@ public class AreaDeportivaController {
     //@PreAuthorize("hasRole('ROL_ADMIN')")
     //MI_AREA k
     @GetMapping("/admin/{adminId}")
-    public ResponseEntity<AreaDeportivaDTO> obtenerPorAdminId(@PathVariable("adminId") Long Id){
-
-        AreaDeportivaDTO dto = areaDeportivaservice.obtenerPorAdminId(Id);
-        return ResponseEntity.ok(dto);
+    public ResponseEntity<?> obtenerPorAdminId(@PathVariable("adminId") Long id) {
+    AreaDeportivaDTO dto = areaDeportivaservice.obtenerPorAdminId(id);
+    if (dto == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body("El administrador no tiene un área deportiva registrada.");
     }
+    return ResponseEntity.ok(dto);
+}
 
     //@PreAuthorize("hasRole('ROL_ADMIN')")
     //MI_AREA k actualizar por adminId
