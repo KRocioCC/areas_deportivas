@@ -92,17 +92,20 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
                 .requestMatchers("/api/administradores/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
                 //.requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR" )
-                .requestMatchers("api/disciplina/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
+                //.requestMatchers("api/disciplina/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
                 
                 //RUTAS para ADMINISTRADOR
                 .requestMatchers("/api/cancha/area/**").hasRole("ADMINISTRADOR") // Solo admins pueden ver canchas por área                .requestMatchers("/api/supervisa/**").hasAnyRole("ADMINISTRADOR") //k
-                .requestMatchers("/api/supervisa/**").hasRole("ADMINISTRADOR") //solo administrador puede supervisar sus canchas y usuarios
-                .requestMatchers("/api/reservas/**").hasAnyRole("CLIENTE", "ADMINISTRADOR", "SUPERUSUARIO") //admins pueden ver reservas de sus canchas
+                .requestMatchers("/api/supervisa/**").hasRole("ADMINISTRADOR") //solo administrador puede supervisar sus canchas y usuarios               
                 .requestMatchers("/api/usuario_control/**").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO") //solo admins pueden gestionar sus usuarios de control
                 .requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE") // admins pueden gestionar incluye
 
                 // Rutas que incluyen clientes
-                .requestMatchers("/api/clientes", "/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                //.requestMatchers("/api/clientes", "/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                .requestMatchers("/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                .requestMatchers("api/disciplina/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                .requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR","CLIENTE") // admins pueden gestionar incluye 
+                .requestMatchers("/api/reservas/**").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO","CLIENTE") //admins pueden ver reservas de sus canchas
 
                 // Por defecto, autenticado
                 .anyRequest().authenticated()

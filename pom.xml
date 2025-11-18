@@ -119,6 +119,12 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!--MALDITAS HORAS-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
 
 
     </dependencies>

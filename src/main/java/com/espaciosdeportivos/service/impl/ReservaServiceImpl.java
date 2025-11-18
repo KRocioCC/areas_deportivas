@@ -363,7 +363,7 @@ public class ReservaServiceImpl implements IReservaService {
         // Crear el DTO básico
         ReservaDTO dto = ReservaDTO.builder()
             .idReserva(reserva.getIdReserva())
-            .fechaCreacion(reserva.getFechaCreacion() != null ? reserva.getFechaCreacion() : LocalDateTime.now())
+            //.fechaCreacion(reserva.getFechaCreacion() != null ? reserva.getFechaCreacion() : LocalDateTime.now())
             .fechaReserva(reserva.getFechaReserva())
             .horaInicio(reserva.getHoraInicio())
             .horaFin(reserva.getHoraFin())

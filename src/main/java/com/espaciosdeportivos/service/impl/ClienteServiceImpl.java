@@ -57,6 +57,17 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ClienteDTO> buscarPorEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new RuntimeException("El parámetro email es obligatorio para la búsqueda");
+        }
+        return clienteRepository.findByEmail(email).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public ClienteDTO crearCliente(ClienteDTO dto) {
         // Validar que no exista un cliente con el mismo email

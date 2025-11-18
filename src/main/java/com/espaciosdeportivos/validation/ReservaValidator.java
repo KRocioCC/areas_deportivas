@@ -21,7 +21,6 @@ public class ReservaValidator {
         validarFechas(dto.getFechaCreacion(), dto.getFechaReserva());
         validarHoras(dto.getHoraInicio(), dto.getHoraFin());
         validarEstado(dto.getEstadoReserva());
-        //validarMonto(dto.getMontoTotal());
         validarCliente(dto.getClienteId());
         validarDuracion(dto.getHoraInicio(), dto.getHoraFin());
     }
@@ -68,12 +67,17 @@ public class ReservaValidator {
 
 
     private void validarFechas(LocalDateTime fechaCreacion, LocalDate fechaReserva) {
-        if (fechaCreacion == null || fechaReserva == null) {
-            throw new BusinessException("Las fechas no pueden ser nulas.");
+        // fechaCreacion puede ser null al crear; si viene, validarla
+        if (fechaReserva == null) {
+            throw new BusinessException("La fecha de la reserva no puede ser nula.");
         }
-        if (fechaCreacion.isAfter(LocalDateTime.now())) {
-            throw new BusinessException("La fecha de creación no puede ser futura.");
+
+        if (fechaCreacion != null) {
+            if (fechaCreacion.isAfter(LocalDateTime.now())) {
+                throw new BusinessException("La fecha de creación no puede ser futura.");
+            }
         }
+
         if (fechaReserva.isBefore(LocalDate.now())) {
             throw new BusinessException("La fecha de la reserva no puede ser en el pasado.");
         }
@@ -81,6 +85,7 @@ public class ReservaValidator {
             throw new BusinessException("No se pueden hacer reservas con más de 3 meses de anticipación.");
         }
     }
+
 
     private void validarHoras(LocalTime inicio, LocalTime fin) {
         if (inicio == null || fin == null) {
@@ -106,12 +111,14 @@ public class ReservaValidator {
 
     private void validarEstado(String estado) {
         if (estado == null || estado.isBlank()) {
-            throw new BusinessException("El estado de la reserva es obligatorio.");
+            // permitimos null/blank en creación; el servicio establecerá PENDIENTE por defecto
+            return;
         }
         if (!ESTADOS_VALIDOS.contains(estado.toUpperCase())) {
             throw new BusinessException("Estado inválido. Solo se permiten: " + ESTADOS_VALIDOS);
         }
     }
+
 
     /*private void validarMonto(Double monto) {
         if (monto == null || monto <= 0) {
