@@ -34,7 +34,7 @@ public class AreaDeportivaController {
         this.areaDeportivaservice = service;
     }
     
-    @GetMapping("/areasdeportivas")
+    @GetMapping("/activos")
     public ResponseEntity<List<AreaDeportivaDTO>> obtenerTodasLasAreasDeportivas() {
         logger.info("[AREA] Inicio obtenerTodas");
         List<AreaDeportivaDTO> lista = areaDeportivaservice.listarTodos();
