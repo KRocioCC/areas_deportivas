@@ -35,6 +35,11 @@ public class AuthDTO {
         private String urlImagen;
 
         private String rolSolicitado; // "CLIENTE", "ADMINISTRADOR", "SUPERUSUARIO"
+
+        private String estadoOperativo;
+        private java.time.LocalTime horaInicioTurno;
+        private java.time.LocalTime horaFinTurno;
+        private String direccion;
     }
 
     @Data @NoArgsConstructor @AllArgsConstructor

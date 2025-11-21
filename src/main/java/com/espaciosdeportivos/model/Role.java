@@ -18,6 +18,7 @@ public class Role {
     public enum RoleName {
         ROL_SUPERUSUARIO,
         ROL_ADMINISTRADOR,
-        ROL_CLIENTE
+        ROL_CLIENTE,
+        ROL_USUARIO_CONTROL
     }
 }

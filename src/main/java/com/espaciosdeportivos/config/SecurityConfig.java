@@ -93,7 +93,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/super/**").hasRole("SUPERUSUARIO")
                 //rutas restringidas por rol
                 // Rutas exclusivas para SUPERUSUARIO
-                //.requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
+                //agregando al usuario de control para verificar funcionamiento
                 //.requestMatchers("/api/**").hasRole("SUPERUSUARIO")
                 //.requestMatchers("/api/cancha/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")   
                 //.requestMatchers("/api/admin/**").hasRole("SUPERUSUARIO") ESTO DEJENLO COMENTADO!
