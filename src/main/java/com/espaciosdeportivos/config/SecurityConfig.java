@@ -19,6 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+//agrego esto
+import org.springframework.http.HttpMethod;
 
 import java.util.Arrays;
 
@@ -62,33 +64,43 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
 
-                //RUTAS PUBLICAS (Sinlogin Sara)
+                // Autenticación
                 .requestMatchers("/api/auth/**").permitAll()
+
+                // Lectura pública de canchas, áreas, disciplinas (solo GETs)
+                .requestMatchers(HttpMethod.GET, "/api/areasdeportivas/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/cancha/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/disciplina/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/cancha/equipamientos/**").permitAll()
+
                 //.requestMatchers("/api/areasdeportivas/**").permitAll()//validar mejor es que yo necesito las ctivas y listar areas deportivas por id eso necsito
-                .requestMatchers("/api/cancha/area/**").permitAll()
-                .requestMatchers("/api/cancha/porid/**").permitAll() //ojito cambie ladirecion de id
-                .requestMatchers("/api/cancha/equipamientos/**").permitAll()
-                .requestMatchers("/api/cancha/disciplinas/**").permitAll()
-                .requestMatchers("/api/cancha/disciplinas/**").permitAll()
-                .requestMatchers("/api/disciplina/porid/**").permitAll()
-                .requestMatchers("/api/disciplina/activos").permitAll()
+                //.requestMatchers("/api/cancha/area/**").permitAll()
+                //.requestMatchers("/api/cancha/porid/**").permitAll() //ojito cambie ladirecion de id
+                //.requestMatchers("/api/cancha/equipamientos/**").permitAll()
+                //.requestMatchers("/api/cancha/disciplinas/**").permitAll()
+                //.requestMatchers("/api/cancha/disciplinas/**").permitAll()
+                //.requestMatchers("/api/disciplina/porid/**").permitAll()
+                //.requestMatchers("/api/disciplina/activos").permitAll()
 
+                // Imágenes y recursos estáticos
                 .requestMatchers("/img/**").permitAll() // 
-
                 .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                //rutas restringidas por rol
 
-                // Rutas exclusivas para SUPERUSUARIO
-                .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
-                //.requestMatchers("/api/**").hasRole("SUPERUSUARIO")
+                // Swagger / OpenAPI
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                /* ==================== SUPERUSUARIO (acceso total a rutas /super) ==================== */
                 .requestMatchers("/api/super/**").hasRole("SUPERUSUARIO")
+                //rutas restringidas por rol
+                // Rutas exclusivas para SUPERUSUARIO
+                //.requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                //.requestMatchers("/api/**").hasRole("SUPERUSUARIO")
                 //.requestMatchers("/api/cancha/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")   
                 //.requestMatchers("/api/admin/**").hasRole("SUPERUSUARIO") ESTO DEJENLO COMENTADO!
                 //.requestMatchers("/api/areasdeportivas/**").hasRole("SUPERUSUARIO")
 
 
-                // Rutas para SUPERUSUARIO y ADMINISTRADOR
+                /* ==================== ADMINISTRADOR y SUPERUSUARIO ==================== */
                 .requestMatchers("/api/admin/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
                 .requestMatchers("/api/administradores/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
                 //.requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR" )
@@ -104,7 +116,7 @@ public class SecurityConfig {
                 //.requestMatchers("/api/clientes", "/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
                 .requestMatchers("/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
                 .requestMatchers("api/disciplina/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
-                .requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR","CLIENTE") // admins pueden gestionar incluye 
+                //.requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR","CLIENTE") // admins pueden gestionar incluye 
                 .requestMatchers("/api/reservas/**").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO","CLIENTE") //admins pueden ver reservas de sus canchas
 
                 // Por defecto, autenticado
