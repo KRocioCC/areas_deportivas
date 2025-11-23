@@ -7,14 +7,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-//import org.springframework.core.io.Resource;
-//import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Slf4j
@@ -25,6 +26,7 @@ import java.util.List;
 public class ImagenController {
 
     private final ImagenService imagenService;
+    private final com.espaciosdeportivos.service.FileStorageService fileStorageService;
 
     @Operation(summary = "Subir imágenes para una entidad", description = "Sube una o múltiples imágenes y las asocia a una entidad específica")
     @PostMapping(value = "/subir/{entidadTipo}/{entidadId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -47,6 +49,36 @@ public class ImagenController {
         }
     }
 
+    @Operation(summary = "Descargar archivo de imagen (proxy)", description = "Descarga el archivo físico de una imagen por su ruta de almacenamiento")
+    @GetMapping("/archivo/**")
+    public ResponseEntity<Resource> descargarArchivoImagen(HttpServletRequest request) {
+        
+        // Obtener la ruta completa manualmente
+        String requestURI = request.getRequestURI();
+        String rutaArchivo = requestURI.split("/archivo/")[1]; // Extrae todo después de "/archivo/"
+        
+        log.info("Descargando archivo de imagen: {}", rutaArchivo);
+
+        try {
+            Resource resource = fileStorageService.cargarArchivo(rutaArchivo);
+
+            String contentType = fileStorageService.obtenerTipoMimeArchivo(rutaArchivo);
+            if (contentType == null || contentType.isBlank()) {
+                contentType = "application/octet-stream";
+            }
+
+            String filename = rutaArchivo.substring(rutaArchivo.lastIndexOf("/") + 1);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                    .body(resource);
+        } catch (Exception e) {
+            log.error("Error descargando archivo: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @Operation(summary = "Obtener imágenes de una entidad", description = "Recupera todas las imágenes activas asociadas a una entidad específica")
     @GetMapping("/entidad/{entidadTipo}/{entidadId}")
     public ResponseEntity<List<ImagenDTO>> obtenerImagenesPorEntidad(
@@ -65,31 +97,6 @@ public class ImagenController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-   /* @Operation(summary = "Descargar archivo de imagen", description = "Descarga el archivo físico de una imagen por su ruta de almacenamiento")
-    @GetMapping("/archivo/{rutaArchivo:.+}")
-    public ResponseEntity<Resource> descargarArchivo(
-            @Parameter(description = "Ruta completa del archivo") 
-            @PathVariable String rutaArchivo) {
-        
-        log.info("Descargando archivo: {}", rutaArchivo);
-        
-        try {
-            //CREAR METODO EN IMAGENSERVICE
-            Resource resource = imagenService.cargarArchivo(rutaArchivo);
-            
-            String contentType = "application/octet-stream";
-            String filename = rutaArchivo.substring(rutaArchivo.lastIndexOf("/") + 1);
-            
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                    .body(resource);
-        } catch (Exception e) {
-            log.error("Error descargando archivo: {}", e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
-    }*/
 
     @Operation(summary = "Eliminar imagen (lógico)", description = "Desactiva una imagen pero mantiene el archivo físico y el registro")
     @DeleteMapping("/logico/{idImagenRelacion}")

@@ -2,24 +2,25 @@ package com.espaciosdeportivos.config;
 
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.core.Ordered;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+    
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Servir archivos desde la carpeta uploads
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:uploads/");
-        registry.addResourceHandler("/img/**")
-                .addResourceLocations("classpath:/static/img/");
+        // Deshabilitar el default resource handler KAREN
+        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        
+        // Solo  rutas específicas,  KAREN
+        registry.addResourceHandler("/static/**", "/public/**")
+                .addResourceLocations("classpath:/static/", "classpath:/public/");
     }
     
-    /*@Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-                .allowedHeaders("*");
-    }*/
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer.setUseSuffixPatternMatch(false);
+    }
 }
