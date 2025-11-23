@@ -34,6 +34,7 @@ public class DatabaseInitializer implements CommandLineRunner {
             roleRepo.save(new Role(null, RoleName.ROL_SUPERUSUARIO));
             roleRepo.save(new Role(null, RoleName.ROL_ADMINISTRADOR));
             roleRepo.save(new Role(null, RoleName.ROL_CLIENTE));
+            roleRepo.save(new Role(null, RoleName.ROL_USUARIO_CONTROL));
             System.out.println("Roles iniciales creados.");
         }
 

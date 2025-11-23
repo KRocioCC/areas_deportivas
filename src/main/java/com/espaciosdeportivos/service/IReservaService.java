@@ -36,7 +36,7 @@ public interface IReservaService {
     
     // Métodos de negocio
     //ReservaDTO confirmarReserva(Long idReserva);
-    //ReservaDTO cancelarReserva(Long idReserva, String motivo);
+    ReservaDTO cancelarReserva(Long idReserva, String motivo);
     ReservaDTO marcarComoEnCurso(Long idReserva);
     ReservaDTO marcarComoCompletada(Long idReserva);
     ReservaDTO marcarComoNoShow(Long idReserva);
@@ -60,5 +60,9 @@ public interface IReservaService {
     List<String> obtenerHorasDisponibles(Long idCancha, LocalDate fecha);
 
     //ReservaDTO crearReserva(ReservaDTO dto);
+    ReservaDTO actualizarEstadoPagoReserva(Long idReserva);
+
+    // Reservas por administrador en rango de fechas
+    List<ReservaDTO> buscarPorAdministradorEnRango(Long idAdministrador, LocalDate inicio, LocalDate fin);
    
 }

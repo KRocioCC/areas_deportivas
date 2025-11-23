@@ -26,12 +26,12 @@ public class ClienteDTO implements Serializable {
 
     @NotBlank(message = "El apellido paterno es obligatorio.")
     @Size(max = 100, message = "El apellido paterno no puede exceder los 100 caracteres.")
-    private String aPaterno;
+    private String apellidoPaterno;
 
 
     @NotBlank(message = "El apellido materno es obligatorio.")
     @Size(max = 100, message = "El apellido materno no puede exceder los 100 caracteres.")
-    private String aMaterno;
+    private String apellidoMaterno;
 
     @NotNull(message = "La fecha de nacimiento es obligatoria.")
     @Past(message = "La fecha de nacimiento debe ser una fecha pasada.")

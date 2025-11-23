@@ -1,6 +1,7 @@
 package com.espaciosdeportivos.controller;
 
 import com.espaciosdeportivos.dto.AuthDTO.*;
+import com.espaciosdeportivos.dto.RegistroDTO;
 import com.espaciosdeportivos.dto.RegistroDTO.*;
 import com.espaciosdeportivos.model.AppUser;
 import com.espaciosdeportivos.model.Persona;
@@ -63,6 +64,16 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/registro/usuario-control")
+    public ResponseEntity<?> registrarUsuarioControl(@Valid @RequestBody RegistroDTO.RegistroUsuarioControlRequest request) {
+        try {
+            String resultado = registrationService.registrarUsuarioControl(request);
+            return ResponseEntity.ok(new MessageResponse(resultado));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
+        }
+    }
+
     @PostMapping("/registro/administrador")
     public ResponseEntity<?> registrarAdministrador(@Valid @RequestBody RegistroAdministradorRequest request) {
         try {
@@ -76,16 +87,35 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         try {
-            // Redirigir al endpoint correspondiente según el rol solicitado
             if ("ADMINISTRADOR".equalsIgnoreCase(signUpRequest.getRolSolicitado()) || 
                 "SUPERUSUARIO".equalsIgnoreCase(signUpRequest.getRolSolicitado())) {
                 
                 return ResponseEntity.badRequest()
                     .body(new MessageResponse("Para registro de administrador use el endpoint /registro/administrador"));
                     
+            } else if ("USUARIO_CONTROL".equalsIgnoreCase(signUpRequest.getRolSolicitado())) {
+                RegistroDTO.RegistroUsuarioControlRequest usuarioControlRequest = RegistroDTO.RegistroUsuarioControlRequest.builder()
+                    .username(signUpRequest.getUsername())
+                    .email(signUpRequest.getEmail())
+                    .password(signUpRequest.getPassword())
+                    .nombre(signUpRequest.getNombre())
+                    .apellidoPaterno(signUpRequest.getApellidoPaterno())
+                    .apellidoMaterno(signUpRequest.getApellidoMaterno())
+                    .telefono(signUpRequest.getTelefono())
+                    .fechaNacimiento(signUpRequest.getFechaNacimiento())
+                    .urlImagen(signUpRequest.getUrlImagen())
+                    .estadoOperativo(signUpRequest.getEstadoOperativo())
+                    .horaInicioTurno(signUpRequest.getHoraInicioTurno())
+                    .horaFinTurno(signUpRequest.getHoraFinTurno())
+                    .direccion(signUpRequest.getDireccion())
+                    .build();
+                
+                String resultado = registrationService.registrarUsuarioControl(usuarioControlRequest);
+                return ResponseEntity.ok(new MessageResponse(resultado));
+                
             } else {
                 // Para cliente usar registro automático
-                RegistroClienteRequest clienteRequest = RegistroClienteRequest.builder()
+                RegistroDTO.RegistroClienteRequest clienteRequest = RegistroDTO.RegistroClienteRequest.builder()
                     .username(signUpRequest.getUsername())
                     .email(signUpRequest.getEmail())
                     .password(signUpRequest.getPassword())
@@ -105,7 +135,6 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
-
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         try {

@@ -1,5 +1,6 @@
 package com.espaciosdeportivos.service.impl;
 
+import com.espaciosdeportivos.dto.RegistroDTO;
 import com.espaciosdeportivos.dto.RegistroDTO.*;
 import com.espaciosdeportivos.model.*;
 import com.espaciosdeportivos.model.Role.RoleName;
@@ -20,6 +21,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final RoleRepository roleRepository;
     private final ClienteRepository clienteRepository;
     private final AdministradorRepository administradorRepository;
+    private final UsuarioControlRepository usuarioControlRepository;
     private final PasswordEncoder passwordEncoder;
     private final AdminConfig adminConfig;
 
@@ -121,6 +123,56 @@ public class RegistrationServiceImpl implements RegistrationService {
             return "Solicitud de administrador registrada. Pendiente de aprobación por superusuario.";
         } catch (Exception e) {
             throw new RuntimeException("Error al registrar administrador: " + e.getMessage(), e);
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public String registrarUsuarioControl(RegistroDTO.RegistroUsuarioControlRequest request) {
+        try {
+            
+            if (userRepository.existsByUsername(request.getUsername())) {
+                return "Error: El nombre de usuario ya está en uso.";
+            }
+            if (userRepository.existsByEmail(request.getEmail())) {
+                return "Error: El email ya está en uso.";
+            }
+            UsuarioControl usuarioControl = UsuarioControl.builder()
+                .nombre(request.getNombre())
+                .apellidoPaterno(request.getApellidoPaterno())
+                .apellidoMaterno(request.getApellidoMaterno())
+                .fechaNacimiento(request.getFechaNacimiento())
+                .telefono(request.getTelefono())
+                .email(request.getEmail())
+                .urlImagen(request.getUrlImagen() != null ? request.getUrlImagen() : "")
+                .estado(true) // Activado inmediatamente
+                .estadoOperativo(request.getEstadoOperativo())
+                .horaInicioTurno(request.getHoraInicioTurno())
+                .horaFinTurno(request.getHoraFinTurno())
+                .direccion(request.getDireccion())
+                .build();
+            
+            usuarioControl = usuarioControlRepository.save(usuarioControl);
+
+            AppUser user = new AppUser();
+            user.setUsername(request.getUsername());
+            user.setEmail(request.getEmail());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setRolSolicitado("USUARIO_CONTROL");
+            user.setActivo(true);
+            user.setEstadoVerificacion("APROBADO");
+            user.setPersona(usuarioControl);
+            
+            Role usuarioControlRole = roleRepository.findByName(RoleName.ROL_USUARIO_CONTROL)
+                .orElseThrow(() -> new RuntimeException("Rol USUARIO_CONTROL no encontrado"));
+            user.getRoles().add(usuarioControlRole);
+            
+            userRepository.save(user);
+
+            return "Usuario de control registrado exitosamente. Ya puede iniciar sesión.";
+        } catch (Exception e) {
+            throw new RuntimeException("Error al registrar usuario de control: " + e.getMessage(), e);
         }
     }
 }

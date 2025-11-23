@@ -38,6 +38,12 @@ public class ClienteController {
         return clienteService.buscarPorNombre(nombre);
     }
 
+    @GetMapping("/buscar/email/{email}")
+    public List<ClienteDTO> buscarPorEmail(@PathVariable String email) {
+        return clienteService.buscarPorEmail(email);
+    }
+
+
     @PostMapping
     public ClienteDTO crear(@Valid @RequestBody ClienteDTO dto) {
         return clienteService.crearCliente(dto);

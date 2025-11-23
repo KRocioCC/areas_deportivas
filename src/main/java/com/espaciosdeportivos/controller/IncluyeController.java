@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -108,6 +109,21 @@ public class IncluyeController {
             @RequestParam Long idDisciplina) {
 
         Double monto = incluyeService.obtenerMontoTotal(idReserva, idCancha, idDisciplina);
+        return ResponseEntity.ok(monto);
+    }
+
+        @GetMapping("/montos")
+    public ResponseEntity<Double> calcularMonto(
+            @RequestParam Long idCancha,
+            @RequestParam Long idDisciplina,
+            @RequestParam String horaInicio,
+            @RequestParam String horaFin) {
+
+        // Convertir Strings a LocalTime
+        LocalTime inicio = LocalTime.parse(horaInicio);
+        LocalTime fin = LocalTime.parse(horaFin);
+
+        Double monto = incluyeService.calcularMonto(idCancha, idDisciplina, inicio, fin);
         return ResponseEntity.ok(monto);
     }
     

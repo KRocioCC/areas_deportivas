@@ -7,6 +7,7 @@ import com.espaciosdeportivos.dto.ClienteDTO;
 import com.espaciosdeportivos.dto.DisciplinaDTO;
 import com.espaciosdeportivos.dto.EquipamientoDTO;
 import com.espaciosdeportivos.dto.ImagenDTO;
+import com.espaciosdeportivos.dto.PagoDTO;
 import com.espaciosdeportivos.dto.ReprogramacionDTO;
 import com.espaciosdeportivos.dto.ReservaDTO;
 import com.espaciosdeportivos.model.AreaDeportiva;
@@ -17,6 +18,7 @@ import com.espaciosdeportivos.model.Disciplina;
 import com.espaciosdeportivos.model.Dispone;
 import com.espaciosdeportivos.model.Incluye;
 import com.espaciosdeportivos.model.Pago;
+import com.espaciosdeportivos.model.Participa;
 import com.espaciosdeportivos.model.Qr;
 import com.espaciosdeportivos.model.Reserva;
 import com.espaciosdeportivos.model.Sepractica;
@@ -65,20 +67,34 @@ public class ReservaServiceImpl implements IReservaService {
     private final AreaDeportivaRepository areaDeportivaRepository;
     private final PagoRepository pagoRepository;
     private final QrRepository qrRepository;
+    private final com.espaciosdeportivos.service.IQrService qrService;
+    private final com.espaciosdeportivos.repository.ParticipaRepository participaRepository;
     private final ReservaValidator reservaValidator;
     private final CancelacionRepository cancelacionRepository;
     private final IncluyeRepository incluyeRepository;
 
 
-/* @Override
+    //listar todas las reservas
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> listarTodas() {
+        return reservaRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+        //obtener por id
+    @Override
+    @Transactional(readOnly = true)
+    public ReservaDTO obtenerPorId(Long id) {
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con ID: " + id));
+        return convertToDTO(reserva);
+    }
+
+        //crear reservas
+    @Override
     @Transactional
-    public ReservaDTO crearReserva(ReservaDTO dto) {
-
-        // ✅ Calcular duración en minutos
-        long duracion = Duration.between(dto.getHoraInicio(), dto.getHoraFin()).toMinutes();
-        dto.setDuracionMinutos((int) duracion);
-
-        // ✅ Validaciones generales
+    public ReservaDTO crear(ReservaDTO dto) {
         reservaValidator.validarReserva(dto);
         validarFechaReserva(dto.getFechaReserva());
 
@@ -86,46 +102,62 @@ public class ReservaServiceImpl implements IReservaService {
             throw new IllegalArgumentException("No hay disponibilidad para el horario seleccionado");
         }
 
-        // ✅ Convertir DTO a entidad Reserva
         Reserva reserva = convertToEntity(dto);
-
-        // ✅ Establecer estado por defecto si no se envía
+        
         if (reserva.getEstadoReserva() == null || reserva.getEstadoReserva().isEmpty()) {
             reserva.setEstadoReserva(Reserva.EstadoReserva.PENDIENTE.name());
         }
 
-        // ✅ Guardar la reserva primero (para obtener el ID generado)
-        Reserva reservaGuardada = reservaRepository.save(reserva);
+        return convertToDTO(reservaRepository.save(reserva));
+    }
 
-        // ✅ Obtener la cancha asociada
-        Cancha cancha = canchaRepository.findById(dto.getCancha().getIdCancha())
-                .orElseThrow(() -> new EntityNotFoundException("Cancha no encontrada"));
+    //actuaalizar reservas
+    @Override
+    @Transactional
+    public ReservaDTO actualizar(Long id, ReservaDTO dto) {
+        reservaValidator.validarReserva(dto);
+        validarFechaReserva(dto.getFechaReserva());
 
-        // ✅ Obtener la disciplina asociada
-        Disciplina disciplina = disciplinaRepository.findById(dto.getDisciplina().getIdDisciplina())
-                .orElseThrow(() -> new EntityNotFoundException("Disciplina no encontrada"));
+        Reserva existente = reservaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con ID: " + id));
 
-        // ✅ Calcular monto total en base al costo de la cancha
-        double horas = duracion / 60.0;
-        double montoTotal = horas * cancha.getCostoHora();
-        reservaGuardada.setMontoTotal(montoTotal);
+        if (!existente.esModificable()) {
+            throw new IllegalArgumentException("No se puede modificar una reserva completada o cancelada");
+        }
 
-        // ✅ Crear registro en la tabla intermedia Incluye
-        Incluye incluye = new Incluye();
-        incluye.setReserva(reservaGuardada);
-        incluye.setCancha(cancha);
-        incluye.setDisciplina(disciplina);
-        incluyeRepository.save(incluye);
+        if (!existente.getFechaReserva().equals(dto.getFechaReserva()) ||
+            !existente.getHoraInicio().equals(dto.getHoraInicio()) ||
+            !existente.getHoraFin().equals(dto.getHoraFin())) {
+            if (!validarDisponibilidad(dto.getFechaReserva(), dto.getHoraInicio(), dto.getHoraFin())) {
+                throw new IllegalArgumentException("No hay disponibilidad para el nuevo horario");
+            }
+        }
 
-        // ✅ Guardar nuevamente la reserva actualizada con el monto total
-        reservaRepository.save(reservaGuardada);
+        existente.setFechaReserva(dto.getFechaReserva());
+        existente.setHoraInicio(dto.getHoraInicio());
+        existente.setHoraFin(dto.getHoraFin());
+        existente.setEstadoReserva(dto.getEstadoReserva());
+        //existente.setMontoTotal(dto.getMontoTotal());
+        existente.setObservaciones(dto.getObservaciones());
+        existente.setCliente(clienteRepository.findById(dto.getClienteId())
+                .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado con ID: " + dto.getClienteId())));
 
-        // ✅ Retornar DTO actualizado
-        return convertToDTO(reservaGuardada);
-    }*/
+        return convertToDTO(reservaRepository.save(existente));
+    }
 
+    //eliminar reserva
+    @Override
+    @Transactional
+    public void eliminar(Long id) {
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con ID: " + id));
+        if (reserva.estaActiva()) {
+            throw new IllegalArgumentException("No se puede eliminar una reserva activa");
+        }
+        reservaRepository.deleteById(id);
+    }
 
-    ///reservas/horario-disponible
+    ///reservas/horario-disponible  aqui se sac los horarios disponibles //modifique
     public List<String> obtenerHorasDisponibles(Long idCancha, LocalDate fecha) {
         Cancha cancha = canchaRepository.findById(idCancha)
                 .orElseThrow(() -> new EntityNotFoundException("Cancha no encontrada"));
@@ -187,88 +219,80 @@ public class ReservaServiceImpl implements IReservaService {
         return inicio + " - " + fin;
     }
 
-    //listar todas las reservas
-    @Override
-    @Transactional(readOnly = true)
-    public List<ReservaDTO> listarTodas() {
-        return reservaRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    //crear reservas
+    //aqui empieza lo de actualizar
+    //aqui es donde se actualiza datos de reserva y se crea el qr
     @Override
     @Transactional
-    public ReservaDTO crear(ReservaDTO dto) {
-        reservaValidator.validarReserva(dto);
-        validarFechaReserva(dto.getFechaReserva());
+    public ReservaDTO actualizarEstadoPagoReserva(Long idReserva) {
+    Reserva reserva = reservaRepository.findById(idReserva)
+            .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con ID: " + idReserva));
 
-        if (!validarDisponibilidad(dto.getFechaReserva(), dto.getHoraInicio(), dto.getHoraFin())) {
-            throw new IllegalArgumentException("No hay disponibilidad para el horario seleccionado");
-        }
+    Incluye incluye = incluyeRepository.findByReservaIdReserva(idReserva)
+            .orElseThrow(() -> new EntityNotFoundException("Incluye no encontrado para reserva: " + idReserva));
 
-        Reserva reserva = convertToEntity(dto);
-        
-        if (reserva.getEstadoReserva() == null || reserva.getEstadoReserva().isEmpty()) {
-            reserva.setEstadoReserva(Reserva.EstadoReserva.PENDIENTE.name());
-        }
-
-        return convertToDTO(reservaRepository.save(reserva));
+            
+    // Validar que la persona sea de tipo Cliente
+    if (!(reserva.getCliente() instanceof Cliente)) {
+        throw new IllegalStateException("El destinatario del QR debe ser un Cliente.");
     }
 
-    //actuaalizar reservas
-    @Override
-    @Transactional
-    public ReservaDTO actualizar(Long id, ReservaDTO dto) {
-        reservaValidator.validarReserva(dto);
-        validarFechaReserva(dto.getFechaReserva());
+    Double montoTotal = incluye.getMontoTotal();
+    Double totalPagado = pagoRepository.sumMontoConfirmadoPorReserva(idReserva);
+    if (totalPagado == null) totalPagado = 0.0;
 
-        Reserva existente = reservaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con ID: " + id));
+    double saldoPendiente = montoTotal - totalPagado;
+    boolean pagadaCompleta = Math.abs(saldoPendiente) <= 0.01;
 
-        if (!existente.esModificable()) {
-            throw new IllegalArgumentException("No se puede modificar una reserva completada o cancelada");
-        }
+        reserva.setTotalPagado(totalPagado);
+        reserva.setSaldoPendiente(saldoPendiente);
+        reserva.setPagadaCompleta(pagadaCompleta);
+        // Guardar cambios en la reserva
+        reserva = reservaRepository.save(reserva);
 
-        if (!existente.getFechaReserva().equals(dto.getFechaReserva()) ||
-            !existente.getHoraInicio().equals(dto.getHoraInicio()) ||
-            !existente.getHoraFin().equals(dto.getHoraFin())) {
-            if (!validarDisponibilidad(dto.getFechaReserva(), dto.getHoraInicio(), dto.getHoraFin())) {
-                throw new IllegalArgumentException("No hay disponibilidad para el nuevo horario");
+        // Si la reserva queda pagada en su totalidad, generar QRs para los invitados confirmados
+        if (Boolean.TRUE.equals(reserva.getPagadaCompleta())) {
+            try {
+                confirmarReserva(idReserva); //aqui confirmo reserva
+                // Delegar la generación de QRs al servicio de QRs para mantener la lógica centralizada
+                log.info("Reserva {} pagada completamente -> generando QRs...", reserva.getIdReserva());
+                generarQrParaReserva(reserva );
+                log.info("Generación de QRs disparada para reserva {}", reserva.getIdReserva());
+            } catch (Exception e) {
+                log.warn("Error generando QR(s) para reserva {}: {}", reserva.getIdReserva(), e.toString());
             }
         }
 
-        existente.setFechaReserva(dto.getFechaReserva());
-        existente.setHoraInicio(dto.getHoraInicio());
-        existente.setHoraFin(dto.getHoraFin());
-        existente.setEstadoReserva(dto.getEstadoReserva());
-        //existente.setMontoTotal(dto.getMontoTotal());
-        existente.setObservaciones(dto.getObservaciones());
-        existente.setCliente(clienteRepository.findById(dto.getClienteId())
-                .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado con ID: " + dto.getClienteId())));
-
-        return convertToDTO(reservaRepository.save(existente));
-    }
-
-    //obtener por id
-    @Override
-    @Transactional(readOnly = true)
-    public ReservaDTO obtenerPorId(Long id) {
-        Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con ID: " + id));
         return convertToDTO(reserva);
     }
 
-    //eliminar reserva
-    @Override
-    @Transactional
-    public void eliminar(Long id) {
-        Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con ID: " + id));
-        if (reserva.estaActiva()) {
-            throw new IllegalArgumentException("No se puede eliminar una reserva activa");
+    // Genera QR(s) PNG y guarda registros en la tabla 'qr'.
+    private void generarQrParaReserva(Reserva reserva) throws Exception {
+        Long idReserva = reserva.getIdReserva();
+
+        // Obtener invitados confirmados; si no hay ninguno, usaremos al cliente como destinatario del QR
+        List<Participa> invitados = participaRepository.findInvitadosConfirmadosPorReserva(idReserva);
+
+        // Buscar QRs existentes para esta reserva y recoger los ids de persona
+        List<Qr> existentes = qrRepository.findByReserva_IdReserva(idReserva);
+        java.util.Set<Long> personasConQr = new java.util.HashSet<>();
+        for (Qr q : existentes) {
+            if (q.getPersona() != null) personasConQr.add(q.getPersona().getId());
         }
-        reservaRepository.deleteById(id);
+
+        if (invitados == null || invitados.isEmpty()) {
+                if (!personasConQr.contains(reserva.getCliente().getId())) {
+                    // usar el servicio de QRs para generar y persistir el QR 
+                    qrService.generarQrParaReserva(reserva.getIdReserva(), reserva.getCliente().getId());
+                }
+            return;
+        }
+
+        // Generar QR para cada invitado confirmado que no tenga QR
+        for (Participa p : invitados) {
+            Long idInv = p.getInvitado().getId();
+            if (personasConQr.contains(idInv)) continue; // evitar duplicados
+                qrService.generarQrParaReserva(reserva.getIdReserva(), idInv);
+        }
     }
 
     // ======================
@@ -315,6 +339,17 @@ public class ReservaServiceImpl implements IReservaService {
                 .collect(Collectors.toList());
     }
 
+    // Reservas por administrador en rango de fechas
+    // para que el administrador vea las reservas de sus canchas en un rango de fechas K
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> buscarPorAdministradorEnRango(Long idAdministrador, LocalDate inicio, LocalDate fin) {
+        List<Reserva> reservas = reservaRepository.findByAdministradorIdAndRangoFechas(idAdministrador, inicio, fin);
+        return reservas.stream()
+                .map(this::convertToDTO) // 
+                .collect(Collectors.toList());
+    }
+
 
     // ======================
     // MAPEO
@@ -328,7 +363,7 @@ public class ReservaServiceImpl implements IReservaService {
         // Crear el DTO básico
         ReservaDTO dto = ReservaDTO.builder()
             .idReserva(reserva.getIdReserva())
-            .fechaCreacion(reserva.getFechaCreacion() != null ? reserva.getFechaCreacion() : LocalDateTime.now())
+            //.fechaCreacion(reserva.getFechaCreacion() != null ? reserva.getFechaCreacion() : LocalDateTime.now())
             .fechaReserva(reserva.getFechaReserva())
             .horaInicio(reserva.getHoraInicio())
             .horaFin(reserva.getHoraFin())
@@ -340,22 +375,67 @@ public class ReservaServiceImpl implements IReservaService {
             .duracionMinutos(reserva.getDuracionMinutos())
             .build();
 
+        // >>> Cargar valores de pago: priorizar valores en la entidad, si faltan calcularlos
+        try {
+            Double totalPagado = reserva.getTotalPagado();
+            if (totalPagado == null) {
+                totalPagado = pagoRepository.sumMontoConfirmadoPorReserva(reserva.getIdReserva());
+            }
+            dto.setTotalPagado(totalPagado != null ? totalPagado : 0.0);
+
+            Double saldo = reserva.getSaldoPendiente();
+            if (saldo == null) {
+                // intentar calcular desde incluye
+                try {
+                    var incluidos = incluyeRepository.findByReservaIdReserva(reserva.getIdReserva());
+                    if (!incluidos.isEmpty()) {
+                        saldo = incluidos.get().getMontoTotal() - (totalPagado != null ? totalPagado : 0.0);
+                    }
+                } catch (Exception ignored) {
+                    saldo = null;
+                }
+            }
+            dto.setSaldoPendiente(saldo);
+
+            Boolean pagada = reserva.getPagadaCompleta();
+            if (pagada == null) {
+                pagada = (dto.getSaldoPendiente() != null) && Math.abs(dto.getSaldoPendiente()) <= 0.01;
+            }
+            dto.setPagadaCompleta(pagada);
+        } catch (Exception e) {
+            log.warn("No se pudo calcular campos de pago para reserva {}: {}", reserva.getIdReserva(), e.getMessage());
+            dto.setTotalPagado(dto.getTotalPagado() == null ? 0.0 : dto.getTotalPagado());
+            dto.setSaldoPendiente(dto.getSaldoPendiente());
+            dto.setPagadaCompleta(dto.getPagadaCompleta());
+        }
+
         try {
             Optional<Incluye> incluidos = incluyeRepository.findByReservaIdReserva(reserva.getIdReserva());
             if (!incluidos.isEmpty()) {
-                //aqui era 0
+                // Obtener datos relacionados desde Incluye
                 Incluye incluye = incluidos.get();
                 dto.setCancha(convertCanchaToDTO(incluye.getCancha()));
                 dto.setDisciplina(convertDisciplinaToDTO(incluye.getDisciplina()));
+
+                // Capacidad total de la cancha (null-safe)
+                if (incluye.getCancha() != null) {
+                    dto.setCapacidadTotal(incluye.getCancha().getCapacidad());
+                } else {
+                    dto.setCapacidadTotal(null);
+                }
+
+                // Invitados confirmados (mantener 0 si es null)
+                Integer invitados = incluye.getInvitadosConfirmados();
+                dto.setInvitadosConfirmados(invitados != null ? invitados : 0);
             }
         } catch (Exception e) {
-            log.warn("Error cargando cancha/disciplina para reserva {}", reserva.getIdReserva(), e);
+            log.warn("Error cargando cancha/disciplina para reserva {}: {}", reserva.getIdReserva(), e);
             dto.setCancha(null);
             dto.setDisciplina(null);
         }
 
         // >>> Cargar PAGOS <<<
-        /*try {
+        try {
             List<Pago> pagos = pagoRepository.findByReservaIdReserva(reserva.getIdReserva());
             dto.setPagos(pagos.stream()
                 .map(this::convertPagoToDTO)
@@ -366,7 +446,7 @@ public class ReservaServiceImpl implements IReservaService {
         }
 
         // >>> Cargar QRs <<<
-        try {
+        /*try {
             List<Qr> qrs = qrRepository.findByReservaIdReserva(reserva.getIdReserva());
             dto.setQrs(qrs.stream()
                 .map(this::convertQrToDTO)
@@ -409,8 +489,8 @@ public class ReservaServiceImpl implements IReservaService {
         return ClienteDTO.builder()
                 .id(cliente.getId())
                 .nombre(cliente.getNombre())
-                .aPaterno(cliente.getApellidoPaterno()) // corregido
-                .aMaterno(cliente.getApellidoMaterno())
+                .apellidoPaterno(cliente.getApellidoPaterno()) // corregido
+                .apellidoMaterno(cliente.getApellidoMaterno())
                 .email(cliente.getEmail())
                 .telefono(cliente.getTelefono())
                 .categoria(cliente.getCategoria())
@@ -447,33 +527,50 @@ public class ReservaServiceImpl implements IReservaService {
                 .build();
     }
 
+    // Mapeo de Cliente como objeto anidado (estilo CanchaServiceImpl)
+    private PagoDTO convertPagoToDTO(Pago pago) {
+        Cliente cliente=pago.getCliente();
+        return PagoDTO.builder()
+            .idPago(pago.getIdPago())
+            .monto(pago.getMonto())
+            .fecha(pago.getFecha())
+            .tipoPago(pago.getTipoPago())
+            .metodoPago(pago.getMetodoPago())
+            .estado(pago.getEstado())
+            .codigoTransaccion(pago.getCodigoTransaccion())
+            .descripcion(pago.getDescripcion())
+            .idReserva(pago.getReserva().getIdReserva())
+            .clienteId(pago.getCliente().getId())
+            .cliente(cliente != null ? convertClienteToDTO(cliente) : null)  
+            .build();
+    }
 
     
     // ======================
     // GESTIÓN DE ESTADOS
     // ======================
 
-    /*@Override
+
     @Transactional
     public ReservaDTO confirmarReserva(Long idReserva) {
         Reserva reserva = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con ID: " + idReserva));
-        reservaValidator.validarConfirmacion(reserva.getEstadoReserva());
+        //reservaValidator.validarConfirmacion(reserva.getEstadoReserva());
         reserva.setEstadoReserva(Reserva.EstadoReserva.CONFIRMADA.name());
         return convertToDTO(reservaRepository.save(reserva));
-    }*/
+    }
 
-    /*@Override
+    @Override
     @Transactional
     public ReservaDTO cancelarReserva(Long idReserva, String motivo) {
         Reserva reserva = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con ID: " + idReserva));
-        reservaValidator.validarCancelacion(reserva.getEstadoReserva());
+        //reservaValidator.validarCancelacion(reserva.getEstadoReserva());
         reserva.setEstadoReserva(Reserva.EstadoReserva.CANCELADA.name());
         reserva.setObservaciones("CANCELADA: " + motivo + 
             (reserva.getObservaciones() != null ? ". " + reserva.getObservaciones() : ""));
         return convertToDTO(reservaRepository.save(reserva));
-    }*/
+    }
 
     @Override
     @Transactional

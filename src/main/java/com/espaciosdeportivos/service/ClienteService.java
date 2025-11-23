@@ -13,6 +13,7 @@ public interface ClienteService {
     List<ClienteDTO> listarTodos();
     ClienteDTO obtenerClientePorId(Long id);
     List<ClienteDTO> buscarPorNombre(String nombre);
+    List<ClienteDTO> buscarPorEmail(String email);
     ClienteDTO crearCliente(ClienteDTO dto);
     ClienteDTO actualizarCliente(Long id, ClienteDTO dto);
     void eliminarCliente(Long id);

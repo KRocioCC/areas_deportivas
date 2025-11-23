@@ -25,7 +25,7 @@ public class Reserva {
     private Long idReserva;
 
     @CreationTimestamp
-    @Column(name = "fecha_creacion", nullable = false, updatable = false)
+    @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
     @Column(name = "fecha_reserva", nullable = false)
@@ -48,6 +48,17 @@ public class Reserva {
 
     @Column(name = "duracion_minutos")
     private Integer duracionMinutos;
+
+    //aqui aumente
+
+    @Column(name = "total_pagado")
+    private Double totalPagado;
+
+    @Column(name = "saldo_pendiente")
+    private Double saldoPendiente;
+
+    @Column(name = "pagada_completa")
+    private Boolean pagadaCompleta;
 
 
     // RELACIÓNES

@@ -71,7 +71,7 @@ public class ClienteValidator {
     // Validación completa para el DTO ClienteDTO
     public void validarCliente(ClienteDTO clienteDTO) {
         validarNombre(clienteDTO.getNombre());
-        validarApellidos(clienteDTO.getAPaterno(), clienteDTO.getAMaterno());
+        validarApellidos(clienteDTO.getApellidoPaterno(), clienteDTO.getApellidoMaterno());
         validarFechaNacimiento(clienteDTO.getFechaNacimiento());
         validarTelefono(clienteDTO.getTelefono());
         validarEmail(clienteDTO.getEmail());

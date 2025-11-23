@@ -1,16 +1,20 @@
 package com.espaciosdeportivos.service.impl;
 
+import com.espaciosdeportivos.dto.ClienteDTO;
 import com.espaciosdeportivos.dto.PagoDTO;
+import com.espaciosdeportivos.model.Cliente;
 import com.espaciosdeportivos.model.Incluye;
 import com.espaciosdeportivos.model.Pago;
 import com.espaciosdeportivos.model.Reserva;
+import com.espaciosdeportivos.repository.ClienteRepository;
 import com.espaciosdeportivos.repository.IncluyeRepository;
 import com.espaciosdeportivos.repository.PagoRepository;
 import com.espaciosdeportivos.repository.ReservaRepository;
 import com.espaciosdeportivos.service.IPagoService;
+import com.espaciosdeportivos.service.IReservaService;
 import com.espaciosdeportivos.validation.PagoValidator;
 import com.espaciosdeportivos.validation.PagoValidator.BusinessException;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +31,12 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class PagoServiceImpl implements IPagoService {
 
-    private PagoRepository pagoRepository;
-    private ReservaRepository reservaRepository;
-    private PagoValidator pagoValidator;
+    private final PagoRepository pagoRepository;
+    private final ReservaRepository reservaRepository;
+    private final PagoValidator pagoValidator;
     private final IncluyeRepository incluyeRepository;
+    private final IReservaService reservaService;
+    private final ClienteRepository clienteRepository;
 
 
 
@@ -39,12 +45,16 @@ public class PagoServiceImpl implements IPagoService {
     @Override
     @Transactional
     public PagoDTO crear(PagoDTO dto) {
+        System.out.println(">>> CREANDO PAGO CON DTO: " + dto);
         pagoValidator.validarPagoCreacion(dto);
         
         Reserva reserva = reservaRepository.findById(dto.getIdReserva())
                 .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con id: " + dto.getIdReserva()));
+        System.out.println(">>> RESERVA ENCONTRADA: " + reserva);
+
         Incluye incluye = incluyeRepository.findByReservaIdReserva(dto.getIdReserva())
                 .orElseThrow(() -> new EntityNotFoundException("Incluye no encontrado con id de reserva: " + dto.getIdReserva()));
+        System.out.println(">>> INCLUYE ENCONTRADO: " + incluye);
 
         Double montoPagado = pagoRepository.sumMontoConfirmadoPorReserva(reserva.getIdReserva());
         Double saldoPendiente = incluye.getMontoTotal() - (montoPagado != null ? montoPagado : 0.0);
@@ -55,7 +65,7 @@ public class PagoServiceImpl implements IPagoService {
                     dto.getMonto(), saldoPendiente)
             );
         }
-
+        System.out.println(">>> SALDO PENDIENTE: " + saldoPendiente);
         // Validar código de transacción único
         if (dto.getCodigoTransaccion() != null && 
             pagoRepository.existsByCodigoTransaccion(dto.getCodigoTransaccion())) {
@@ -65,7 +75,6 @@ public class PagoServiceImpl implements IPagoService {
         Pago pago = mapToEntity(dto);
 
         //Pago pago = convertToEntity(dto);
-        
         // Establecer estado por defecto
         if (pago.getEstado() == null) {
             pago.setEstado(Pago.EstadoPago.PENDIENTE.name());
@@ -122,6 +131,14 @@ public class PagoServiceImpl implements IPagoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<PagoDTO> listarTodos() {
+        return pagoRepository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public void eliminar(Long id) {
         Pago pago = pagoRepository.findById(id)
@@ -134,14 +151,7 @@ public class PagoServiceImpl implements IPagoService {
         
         pagoRepository.deleteById(id);
     }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<PagoDTO> listarTodos() {
-        return pagoRepository.findAll().stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
-    }
+    
 
     // BÚSQUEDAS BÁSICAS
     @Override
@@ -240,8 +250,19 @@ public class PagoServiceImpl implements IPagoService {
         
         pago.setEstado(Pago.EstadoPago.CONFIRMADO.name());
         pago.setCodigoTransaccion(codigoTransaccion);
-        
-        return mapToDTO(pagoRepository.save(pago));
+
+        Pago pagoGuardado = pagoRepository.save(pago);
+        PagoDTO pagoConfirmado = mapToDTO(pagoGuardado);
+
+        // Actualizar montos/estado de la reserva asociada
+        try {
+            reservaService.actualizarEstadoPagoReserva(pagoGuardado.getReserva().getIdReserva());
+        } catch (Exception e) {
+            // No interrumpir la confirmación por un fallo secundario en la actualización de reserva
+            System.err.println("Warning: fallo al actualizar estado de reserva tras confirmar pago: " + e.getMessage());
+        }
+
+        return pagoConfirmado;
     }
 
     @Override
@@ -336,7 +357,7 @@ public class PagoServiceImpl implements IPagoService {
         Reserva reserva = pago.getReserva();
         Incluye incluye = incluyeRepository.findByReservaIdReserva(reserva.getIdReserva())
                 .orElseThrow(() -> new EntityNotFoundException("Incluye no encontrado con id de reserva: " + reserva.getIdReserva()));
-        
+        Cliente cliente=pago.getCliente();
         // Calcular saldo pendiente
         Double montoPagado = pagoRepository.sumMontoConfirmadoPorReserva(reserva.getIdReserva());
         Double saldoPendiente = incluye.getMontoTotal() - (montoPagado != null ? montoPagado : 0.0);
@@ -351,6 +372,25 @@ public class PagoServiceImpl implements IPagoService {
                 .codigoTransaccion(pago.getCodigoTransaccion())
                 .descripcion(pago.getDescripcion())
                 .idReserva(pago.getReserva() != null ? pago.getReserva().getIdReserva() : null)
+                .clienteId(cliente != null ? cliente.getId() : null)
+                .cliente(cliente != null ? convertClienteToDTO(cliente) : null)
+                .build();
+    }
+
+    //mapeo pago
+    // Mapeo de Cliente como objeto anidado (estilo CanchaServiceImpl)
+    private ClienteDTO convertClienteToDTO(Cliente cliente) {
+        if (cliente == null) return null;
+        return ClienteDTO.builder()
+                .id(cliente.getId())
+                .nombre(cliente.getNombre())
+                .apellidoPaterno(cliente.getApellidoPaterno()) 
+                .apellidoMaterno(cliente.getApellidoMaterno())
+                .estado(cliente.getEstado())
+                .urlImagen(cliente.getUrlImagen())
+                .email(cliente.getEmail())
+                .telefono(cliente.getTelefono())
+                .categoria(cliente.getCategoria())
                 .build();
     }
 
@@ -358,6 +398,8 @@ public class PagoServiceImpl implements IPagoService {
         
         Reserva reserva = reservaRepository.findById(dto.getIdReserva())
                 .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con id: " + dto.getIdReserva()));
+        Cliente cliente = clienteRepository.findById(dto.getClienteId())
+            .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado con ID: " + dto.getClienteId()));
 
         return Pago.builder()
                 .monto(dto.getMonto())
@@ -368,6 +410,7 @@ public class PagoServiceImpl implements IPagoService {
                 .codigoTransaccion(dto.getCodigoTransaccion())
                 .descripcion(dto.getDescripcion())
                 .reserva(reserva)
+                .cliente(cliente)
                 .build();
     }
 }

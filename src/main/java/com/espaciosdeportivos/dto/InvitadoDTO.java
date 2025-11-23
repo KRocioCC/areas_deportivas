@@ -45,5 +45,5 @@ public class InvitadoDTO implements Serializable {
     private Boolean verificado;
 
     //objeto
-    private QrDTO qr;
+    //private QrDTO qr;
 }
