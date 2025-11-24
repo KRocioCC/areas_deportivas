@@ -35,7 +35,6 @@ public class SecurityConfig {
 
     @Autowired
     private JwtUtils jwtUtils;
-    
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -57,72 +56,73 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                // =============================================
-                // 🔓 RUTAS PÚBLICAS (Sin autenticación)
-                // =============================================
-                
-                // Autenticación
-                .requestMatchers("/api/auth/**").permitAll()
-                
-                // Documentación
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                
-                // Archivos e imágenes
-                .requestMatchers("/api/imagenes/archivo/**").permitAll()
-                .requestMatchers("/api/archivos/**").permitAll()
-                .requestMatchers("/img/**").permitAll()
-                
-                // Rutas públicas generales
-                .requestMatchers("/api/public/**").permitAll()
-                
-                // Canchas (públicas)
-                .requestMatchers("/api/cancha/area/**").permitAll()
-                .requestMatchers("/api/cancha/porid/**").permitAll()
-                .requestMatchers("/api/cancha/equipamientos/**").permitAll()
-                .requestMatchers("/api/cancha/disciplinas/**").permitAll()
-                
-                // Disciplinas (públicas)
-                .requestMatchers("/api/disciplina/porid/**").permitAll()
-                .requestMatchers("/api/disciplina/activos").permitAll()
-                
-                // Reservas (públicas)
-                .requestMatchers("/api/reservas/**").permitAll()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // =============================================
+                        // 🔓 RUTAS PÚBLICAS (Sin autenticación)
+                        // =============================================
 
-                // =============================================
-                //  RUTAS CON ROLES ESPECÍFICOS
-                // =============================================
-                
-                // SUPERUSUARIO exclusivo
-                .requestMatchers("/api/super/**").hasRole("SUPERUSUARIO")
-                
-                // SUPERUSUARIO y ADMINISTRADOR
-                .requestMatchers("/api/administradores/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
-                .requestMatchers(HttpMethod.POST, "/api/cancha/*/imagenes").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO")
-                .requestMatchers("/api/usuario_control/**").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO")
-                .requestMatchers(HttpMethod.PUT, "/api/reservas/*/eliminar").hasRole("ADMINISTRADOR")
-                
-                // ADMINISTRADOR exclusivo
-                .requestMatchers("/api/supervisa/**").hasRole("ADMINISTRADOR")
-                
-                // =============================================
-                //  RUTAS MIXTAS (Múltiples roles)
-                // =============================================
-                
-                .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
-                .requestMatchers("/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
-                .requestMatchers("/api/disciplina/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
-                .requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                        // Autenticación
+                        .requestMatchers("/api/auth/**").permitAll()
 
-                // =============================================
-                // RUTA POR DEFECTO
-                // =============================================
-                .anyRequest().authenticated()
-            );
+                        // Documentación
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        // Archivos e imágenes
+                        .requestMatchers("/api/imagenes/archivo/**").permitAll()
+                        .requestMatchers("/api/archivos/**").permitAll()
+                        .requestMatchers("/img/**").permitAll()
+
+                        // Rutas públicas generales
+                        .requestMatchers("/api/public/**").permitAll()
+
+                        // Canchas (públicas)
+                        .requestMatchers("/api/cancha/area/**").permitAll()
+                        .requestMatchers("/api/cancha/porid/**").permitAll()
+                        .requestMatchers("/api/cancha/equipamientos/**").permitAll()
+                        .requestMatchers("/api/cancha/disciplinas/**").permitAll()
+
+                        // Disciplinas (públicas)
+                        .requestMatchers("/api/disciplina/porid/**").permitAll()
+                        .requestMatchers("/api/disciplina/activos").permitAll()
+
+                        // Reservas (públicas)
+                        .requestMatchers("/api/reservas/**").permitAll()
+
+                        // =============================================
+                        // RUTAS CON ROLES ESPECÍFICOS
+                        // =============================================
+
+                        // SUPERUSUARIO exclusivo
+                        .requestMatchers("/api/super/**").hasRole("SUPERUSUARIO")
+
+                        // SUPERUSUARIO y ADMINISTRADOR
+                        .requestMatchers("/api/administradores/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/cancha/*/imagenes")
+                        .hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO")
+                        .requestMatchers("/api/usuario_control/**").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO")
+                        .requestMatchers(HttpMethod.PUT, "/api/reservas/*/eliminar").hasRole("ADMINISTRADOR")
+
+                        // ADMINISTRADOR exclusivo
+                        .requestMatchers("/api/supervisa/**").hasRole("ADMINISTRADOR")
+
+                        // =============================================
+                        // RUTAS MIXTAS (Múltiples roles)
+                        // =============================================
+
+                        .requestMatchers("/api/areasdeportivas/**")
+                        .hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                        .requestMatchers("/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                        .requestMatchers("/api/disciplina/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                        .requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+
+                        // =============================================
+                        // RUTA POR DEFECTO
+                        // =============================================
+                        .anyRequest().authenticated());
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -134,14 +134,13 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*", "http://127.0.0.1:*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList(
-            "Authorization",
-            "Content-Type",
-            "Accept",
-            "Origin",
-            "X-Requested-With",
-            "Access-Control-Request-Method",
-            "Access-Control-Request-Headers"
-        ));
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
