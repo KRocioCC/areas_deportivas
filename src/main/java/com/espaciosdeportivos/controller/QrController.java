@@ -91,7 +91,7 @@ public class QrController {
 
     //K PA FRONT
     @GetMapping("/reserva/{id}")
-    public ResponseEntity<List<QrDTO>> obtenerQrsPorReserva(@PathVariable Long id) {
+    public ResponseEntity<List<QrDTO>> obtenerQrsPorReservas(@PathVariable Long id) {
         logger.info("[QR] Inicio obtenerQrsPorReserva: {}", id);
         List<QrDTO> qrs = qrService.obtenerQrsPorReserva(id);
         logger.info("[QR] Fin obtenerQrsPorReserva");
@@ -171,11 +171,6 @@ public class QrController {
         return ResponseEntity.ok(qrService.obtenerQrPorCodigo(codigoQr));
     }
 
-    // Buscar QRs por reserva
-    @GetMapping("/reserva/{idReserva}")
-    public ResponseEntity<List<QrDTO>> obtenerPorReserva(@PathVariable Long idReserva) {
-        return ResponseEntity.ok(qrService.obtenerQrsPorReserva(idReserva));
-    }
 
     //  Buscar QRs por persona
     @GetMapping("/persona/{idPersona}")

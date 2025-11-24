@@ -70,6 +70,82 @@ public class QrServiceImpl implements IQrService {
         return convertToDTO(qr);
     }
 
+    @Override
+    public QrDTO crearQr(@Valid QrDTO dto) {
+        qrValidator.validarQr(dto);
+
+        Reserva reserva = reservaRepository.findById(dto.getIdReserva())
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + dto.getIdReserva()));
+
+        Persona persona = personaRepository.findById(dto.getIdPersona())
+                .orElseThrow(() -> new RuntimeException("Invitado no encontrado con ID: " + dto.getIdPersona()));
+
+        UsuarioControl usuarioControl = usuarioControlRepository.findById(dto.getIdUsuarioControl())
+                .orElseThrow(() -> new RuntimeException("UsuarioControl no encontrado con ID: " + dto.getIdUsuarioControl()));
+
+        Qr entidad = toEntity(dto, reserva, persona, usuarioControl);
+        entidad.setIdQr(null);
+        entidad.setEstado(Boolean.TRUE);
+
+        return convertToDTO(qrRepository.save(entidad));
+    }
+
+    @Override
+    public QrDTO actualizarQr(Long id, @Valid QrDTO dto) {
+        Qr existente = qrRepository.findByIdQrAndEstadoTrue(id)
+                .orElseThrow(() -> new RuntimeException("QR no encontrado con ID: " + id));
+
+        qrValidator.validarQr(dto);
+
+        Reserva reserva = reservaRepository.findById(dto.getIdReserva())
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + dto.getIdReserva()));
+
+        Persona persona = invitadoRepository.findById(dto.getIdPersona())
+                .orElseThrow(() -> new RuntimeException("Invitado no encontrado con ID: " + dto.getIdPersona()));
+
+        UsuarioControl usuarioControl = usuarioControlRepository.findById(dto.getIdUsuarioControl())
+                .orElseThrow(() -> new RuntimeException("UsuarioControl no encontrado con ID: " + dto.getIdUsuarioControl()));
+
+        existente.setCodigoQr(dto.getCodigoQr());
+        existente.setFechaGeneracion(dto.getFechaGeneracion());
+        existente.setFechaExpiracion(dto.getFechaExpiracion());
+        existente.setEstado(dto.getEstado());
+        existente.setDescripcion(dto.getDescripcion());
+        existente.setReserva(reserva);
+        existente.setPersona(persona);
+        existente.setPersona(persona);
+        existente.setUsuarioControl(usuarioControl);
+        existente.setEsCliente(dto.getEsCliente());
+
+        return convertToDTO(qrRepository.save(existente));
+    }
+
+    @Override
+    public QrDTO eliminarQr(Long id) {
+        Qr existente = qrRepository.findByIdQrAndEstadoTrue(id)
+                .orElseThrow(() -> new RuntimeException("QR no encontrado con ID: " + id));
+        existente.setEstado(Boolean.FALSE);
+        return convertToDTO(qrRepository.save(existente));
+    }
+
+    @Override
+    public Qr obtenerQrConBloqueo(Long id) {
+        Qr qr = qrRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("QR no encontrado con ID: " + id));
+        try {
+            Thread.sleep(15000); // Simula espera
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return qr;
+    }
+
+    @Override
+    public void eliminarQrFisicamente(Long id) {
+        Qr existente = qrRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("QR no encontrado con ID: " + id));
+        qrRepository.delete(existente);
+    }
 
     @Override
     public QrDTO generarQrParaReserva(Long idReserva, Long idPersona) {
@@ -219,92 +295,14 @@ public class QrServiceImpl implements IQrService {
         }
     }
 
-    @Override
-    public QrDTO crearQr(@Valid QrDTO dto) {
-        qrValidator.validarQr(dto);
-
-        Reserva reserva = reservaRepository.findById(dto.getIdReserva())
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + dto.getIdReserva()));
-
-        Persona persona = personaRepository.findById(dto.getIdPersona())
-                .orElseThrow(() -> new RuntimeException("Invitado no encontrado con ID: " + dto.getIdPersona()));
-
-        UsuarioControl usuarioControl = usuarioControlRepository.findById(dto.getIdUsuarioControl())
-                .orElseThrow(() -> new RuntimeException("UsuarioControl no encontrado con ID: " + dto.getIdUsuarioControl()));
-
-        Qr entidad = toEntity(dto, reserva, persona, usuarioControl);
-        entidad.setIdQr(null);
-        entidad.setEstado(Boolean.TRUE);
-
-        return convertToDTO(qrRepository.save(entidad));
-    }
-
-    @Override
-    public QrDTO actualizarQr(Long id, @Valid QrDTO dto) {
-        Qr existente = qrRepository.findByIdQrAndEstadoTrue(id)
-                .orElseThrow(() -> new RuntimeException("QR no encontrado con ID: " + id));
-
-        qrValidator.validarQr(dto);
-
-        Reserva reserva = reservaRepository.findById(dto.getIdReserva())
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + dto.getIdReserva()));
-
-        Persona persona = invitadoRepository.findById(dto.getIdPersona())
-                .orElseThrow(() -> new RuntimeException("Invitado no encontrado con ID: " + dto.getIdPersona()));
-
-        UsuarioControl usuarioControl = usuarioControlRepository.findById(dto.getIdUsuarioControl())
-                .orElseThrow(() -> new RuntimeException("UsuarioControl no encontrado con ID: " + dto.getIdUsuarioControl()));
-
-        existente.setCodigoQr(dto.getCodigoQr());
-        existente.setFechaGeneracion(dto.getFechaGeneracion());
-        existente.setFechaExpiracion(dto.getFechaExpiracion());
-        existente.setEstado(dto.getEstado());
-        existente.setDescripcion(dto.getDescripcion());
-        existente.setReserva(reserva);
-        existente.setPersona(persona);
-        existente.setPersona(persona);
-        existente.setUsuarioControl(usuarioControl);
-        existente.setEsCliente(dto.getEsCliente());
-
-        return convertToDTO(qrRepository.save(existente));
-    }
-
-    @Override
-    public QrDTO eliminarQr(Long id) {
-        Qr existente = qrRepository.findByIdQrAndEstadoTrue(id)
-                .orElseThrow(() -> new RuntimeException("QR no encontrado con ID: " + id));
-        existente.setEstado(Boolean.FALSE);
-        return convertToDTO(qrRepository.save(existente));
-    }
-
-    @Override
-    public void eliminarQrFisicamente(Long id) {
-        Qr existente = qrRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("QR no encontrado con ID: " + id));
-        qrRepository.delete(existente);
-    }
+    
 
     //k pa front
-    /*@Override
-        public List<QrDTO> obtenerQrsPorReserva(Long idReserva) {
+    @Override
+    public List<QrDTO> obtenerQrsPorReserva(Long idReserva) {
         List<Qr> qrs = qrRepository.findByReservaIdReserva(idReserva);
         return qrs.stream().map(this::convertToDto).collect(Collectors.toList());
-        }*/
-
-
-
-    @Override
-    public Qr obtenerQrConBloqueo(Long id) {
-        Qr qr = qrRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("QR no encontrado con ID: " + id));
-        try {
-            Thread.sleep(15000); // Simula espera
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        return qr;
     }
-  //OBTNER QRS
 
         @Override
         @Transactional(readOnly = true)
@@ -320,13 +318,14 @@ public class QrServiceImpl implements IQrService {
                 List<Qr> qrs = qrRepository.findByPersona_IdAndEstadoTrue(idPersona);
                 return qrs.stream().map(this::convertToDTO).collect(Collectors.toList());
         }
+        
 
-        @Override
+        /*@Override
         @Transactional(readOnly = true)
                 public List<QrDTO> obtenerQrsPorReserva(Long idReserva) {
                 List<Qr> qrs = qrRepository.findByReserva_IdReservaAndEstadoTrue(idReserva);
                 return qrs.stream().map(this::convertToDTO).collect(Collectors.toList());
-        }
+        }*/
     // ---------- mapping ----------
     private QrDTO convertToDTO(Qr qr) {
         return QrDTO.builder()

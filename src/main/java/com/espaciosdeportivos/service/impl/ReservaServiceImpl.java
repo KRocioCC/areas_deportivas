@@ -8,6 +8,7 @@ import com.espaciosdeportivos.dto.DisciplinaDTO;
 import com.espaciosdeportivos.dto.EquipamientoDTO;
 import com.espaciosdeportivos.dto.ImagenDTO;
 import com.espaciosdeportivos.dto.PagoDTO;
+import com.espaciosdeportivos.dto.QrDTO;
 import com.espaciosdeportivos.dto.ReprogramacionDTO;
 import com.espaciosdeportivos.dto.ReservaDTO;
 import com.espaciosdeportivos.model.AreaDeportiva;
@@ -73,7 +74,7 @@ public class ReservaServiceImpl implements IReservaService {
     private final CancelacionRepository cancelacionRepository;
     private final IncluyeRepository incluyeRepository;
 
-
+    //  CRUD SIMPLE
     //listar todas las reservas
     @Override
     @Transactional(readOnly = true)
@@ -156,6 +157,9 @@ public class ReservaServiceImpl implements IReservaService {
         }
         reservaRepository.deleteById(id);
     }
+
+
+
 
     ///reservas/horario-disponible  aqui se sac los horarios disponibles //modifique
     public List<String> obtenerHorasDisponibles(Long idCancha, LocalDate fecha) {
@@ -349,6 +353,17 @@ public class ReservaServiceImpl implements IReservaService {
                 .map(this::convertToDTO) // 
                 .collect(Collectors.toList());
     }
+    //Reservas  para el cliente todas sus reservas
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> buscarTodasLasReservasDelCliente(Long clienteId) {
+
+        List<Reserva> reservas = reservaRepository.findByClienteId(clienteId);
+
+        return reservas.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
 
     // ======================
@@ -446,7 +461,7 @@ public class ReservaServiceImpl implements IReservaService {
         }
 
         // >>> Cargar QRs <<<
-        /*try {
+        try {
             List<Qr> qrs = qrRepository.findByReservaIdReserva(reserva.getIdReserva());
             dto.setQrs(qrs.stream()
                 .map(this::convertQrToDTO)
@@ -455,6 +470,7 @@ public class ReservaServiceImpl implements IReservaService {
             log.warn("Error cargando QRs para reserva {}", reserva.getIdReserva(), e);
             dto.setQrs(List.of());
         }
+        /* 
 
         // >>> Cargar CANCELACIÓN (0 o 1) <<<
         try {
@@ -542,6 +558,23 @@ public class ReservaServiceImpl implements IReservaService {
             .idReserva(pago.getReserva().getIdReserva())
             .clienteId(pago.getCliente().getId())
             .cliente(cliente != null ? convertClienteToDTO(cliente) : null)  
+            .build();
+    }
+
+    //MAPEO DE QR
+    private QrDTO convertQrToDTO(Qr qr) {
+    return QrDTO.builder()
+            .idQr(qr.getIdQr())
+            .codigoQr(qr.getCodigoQr())
+            .fechaGeneracion(qr.getFechaGeneracion())
+            .fechaExpiracion(qr.getFechaExpiracion())
+            .estado(qr.getEstado())
+            .urlQr(qr.getUrlQr())
+            .descripcion(qr.getDescripcion())
+            .idReserva(qr.getReserva() != null ? qr.getReserva().getIdReserva() : null)
+            .idPersona(qr.getPersona() != null ? qr.getPersona().getId() : null)
+            .esCliente(qr.getEsCliente()).idUsuarioControl(qr.getUsuarioControl() != null ? qr.getUsuarioControl().getId() : null)
+            .idUsuarioControl(qr.getUsuarioControl() != null ? qr.getUsuarioControl().getId() : null)
             .build();
     }
 

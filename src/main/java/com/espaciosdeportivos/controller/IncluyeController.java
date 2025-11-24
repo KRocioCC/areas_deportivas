@@ -112,6 +112,17 @@ public class IncluyeController {
         return ResponseEntity.ok(monto);
     }
 
+    // Soportar también la llamada usando segmentos de ruta: /monto-total/{idReserva}/{idCancha}/{idDisciplina}
+    @GetMapping("/monto-total/{idReserva}/{idCancha}/{idDisciplina}")
+    public ResponseEntity<Double> obtenerMontoTotalPath(
+            @PathVariable Long idReserva,
+            @PathVariable Long idCancha,
+            @PathVariable Long idDisciplina) {
+
+        Double monto = incluyeService.obtenerMontoTotal(idReserva, idCancha, idDisciplina);
+        return ResponseEntity.ok(monto);
+    }
+
         @GetMapping("/montos")
     public ResponseEntity<Double> calcularMonto(
             @RequestParam Long idCancha,

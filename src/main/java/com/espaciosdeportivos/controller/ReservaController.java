@@ -197,6 +197,12 @@ public class ReservaController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar el estado de pago.");
         }
     }
+    //RESERVAS DEL CLIENTE
+    @GetMapping("/cliente/{clienteId}/reserva")
+    public ResponseEntity<List<ReservaDTO>> buscarTodasPorCliente(@PathVariable Long clienteId) {
+        List<ReservaDTO> reservas = reservaService.buscarTodasLasReservasDelCliente(clienteId);
+        return ResponseEntity.ok(reservas);
+    }
 
     /*@GetMapping("/codigo/{codigo}")
     public ResponseEntity<ReservaDTO> obtenerPorCodigo(@PathVariable String codigo) {
