@@ -64,5 +64,8 @@ public interface IReservaService {
 
     // Reservas por administrador en rango de fechas
     List<ReservaDTO> buscarPorAdministradorEnRango(Long idAdministrador, LocalDate inicio, LocalDate fin);
+
+    // Listar reservas por cancha k
+    List<ReservaDTO> listarReservasPorCancha(Long idCancha);
    
 }
