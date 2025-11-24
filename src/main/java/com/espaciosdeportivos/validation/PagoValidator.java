@@ -70,9 +70,6 @@ public class PagoValidator {
         if (fecha == null) {
             throw new BusinessException("La fecha del pago es obligatoria.");
         }
-        if (fecha.isAfter(LocalDate.now())) {
-            throw new BusinessException("La fecha del pago no puede ser futura.");
-        }
         if (fecha.isBefore(LocalDate.now().minusYears(1))) {
             throw new BusinessException("La fecha del pago no puede ser anterior a un año.");
         }
