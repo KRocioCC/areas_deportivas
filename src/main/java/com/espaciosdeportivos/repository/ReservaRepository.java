@@ -119,5 +119,11 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
               @Param("inicio") LocalDate inicio,
               @Param("fin") LocalDate fin);
 
+       
+       // Obtener todas las reservas asociadas a una cancha específica K
+       @Query("SELECT r FROM Reserva r " +
+           "JOIN Incluye i ON r.idReserva = i.reserva.idReserva " +
+           "WHERE i.cancha.idCancha = :idCancha")
+       List<Reserva> findAllByCanchaId(@Param("idCancha") Long idCancha);
 
 }

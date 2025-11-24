@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -63,7 +64,10 @@ public class SecurityConfig {
             .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-
+                // =============================================
+                // 🔓 RUTAS PÚBLICAS (Sin autenticación)
+                // =============================================
+                
                 // Autenticación
                 .requestMatchers("/api/auth/**").permitAll()
 
@@ -107,23 +111,25 @@ public class SecurityConfig {
                 /* ==================== ADMINISTRADOR y SUPERUSUARIO ==================== */
                 .requestMatchers("/api/admin/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
                 .requestMatchers("/api/administradores/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
-                //.requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR" )
-                //.requestMatchers("api/disciplina/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
+                .requestMatchers(HttpMethod.POST, "/api/cancha/*/imagenes").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO")
+                .requestMatchers("/api/usuario_control/**").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO")
+                .requestMatchers(HttpMethod.PUT, "/api/reservas/*/eliminar").hasRole("ADMINISTRADOR")
                 
-                //RUTAS para ADMINISTRADOR
-                .requestMatchers("/api/cancha/area/**").hasRole("ADMINISTRADOR") // Solo admins pueden ver canchas por área                .requestMatchers("/api/supervisa/**").hasAnyRole("ADMINISTRADOR") //k
-                .requestMatchers("/api/supervisa/**").hasRole("ADMINISTRADOR") //solo administrador puede supervisar sus canchas y usuarios               
-                .requestMatchers("/api/usuario_control/**").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO") //solo admins pueden gestionar sus usuarios de control
-                //.requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE") // admins pueden gestionar incluye
-
-                // Rutas que incluyen clientes
-                //.requestMatchers("/api/clientes", "/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                // ADMINISTRADOR exclusivo
+                .requestMatchers("/api/supervisa/**").hasRole("ADMINISTRADOR")
+                
+                // =============================================
+                //  RUTAS MIXTAS (Múltiples roles)
+                // =============================================
+                
+                .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
                 .requestMatchers("/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
-                //.requestMatchers("/api/disciplina/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
-                .requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR","CLIENTE") // admins pueden gestionar incluye 
-                .requestMatchers("/api/reservas/**").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO","CLIENTE") //admins pueden ver reservas de sus canchas
+                //.requestMatchers("//api/disciplina/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                .requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
 
-                // Por defecto, autenticado
+                // =============================================
+                // RUTA POR DEFECTO
+                // =============================================
                 .anyRequest().authenticated()
             );
 
@@ -154,4 +160,3 @@ public class SecurityConfig {
         return source;
     }
 }
-

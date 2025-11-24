@@ -1,9 +1,11 @@
 package com.espaciosdeportivos.controller;
 
 import com.espaciosdeportivos.dto.ReservaDTO;
+import com.espaciosdeportivos.model.Reserva;
 import com.espaciosdeportivos.service.IReservaService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,10 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/reservas")
@@ -25,8 +31,9 @@ public class ReservaController {
     @Autowired
     private IReservaService reservaService;
 
+    private static final Logger logger = LoggerFactory.getLogger(ReservaController.class);
+
     // CRUD
-    @GetMapping
     public ResponseEntity<List<ReservaDTO>> listarTodas() {
         List<ReservaDTO> reservas = reservaService.listarTodas();
         return ResponseEntity.ok(reservas);
@@ -222,4 +229,21 @@ public class ReservaController {
         return ResponseEntity.ok(reservas);
     }
 
+    // Listar reservas por cancha k
+    /*@GetMapping("/{idCancha}/reservas")
+    public ResponseEntity<List<Reserva>> obtenerReservasPorCancha(@PathVariable Long idCancha) {
+        List<Reserva> reservas = reservaService.listarReservasPorCancha(idCancha);
+        return ResponseEntity.ok(reservas);
+    }/* */
+
+    
+
+    // Listar reservas por cancha k
+@GetMapping("/{idCancha}/reservas")
+public ResponseEntity<List<ReservaDTO>> obtenerReservasPorCancha(@PathVariable Long idCancha) {
+    List<ReservaDTO> reservas = reservaService.listarReservasPorCancha(idCancha);
+    return ResponseEntity.ok(reservas);
+}
+
+       
 }

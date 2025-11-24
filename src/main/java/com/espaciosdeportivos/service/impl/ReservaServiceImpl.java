@@ -667,5 +667,15 @@ public class ReservaServiceImpl implements IReservaService {
         return ingresos != null ? ingresos : 0.0;
     }*/
 
+// Listar reservas por cancha k
+@Override
+@Transactional(readOnly = true)
+public List<ReservaDTO> listarReservasPorCancha(Long idCancha) {
+    List<Reserva> reservas = reservaRepository.findAllByCanchaId(idCancha);
+
+    return reservas.stream()
+            .map(this::convertToDTO) // usa el mismo convertToDTO que ya tienes
+            .collect(Collectors.toList());
+}
 
 }

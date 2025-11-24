@@ -62,7 +62,7 @@ public interface IReservaService {
     //List<Reserva> findReservaByCancha(Long idCancha);
 
     //ReservaDTO crearReserva(ReservaDTO dto);
-    
 
-
+       // Listar reservas por cancha k
+    List<ReservaDTO> listarReservasPorCancha(Long idCancha);
 }
