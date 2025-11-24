@@ -235,7 +235,7 @@ public class AreaDeportivaServiceImpl implements IAreaDeportivaService {
 
     // ---------- mapping ----------
     private AreaDeportivaDTO convertToDTO(AreaDeportiva a) {
-        return AreaDeportivaDTO.builder()
+        AreaDeportivaDTO dto = AreaDeportivaDTO.builder()
                 .idAreadeportiva(a.getIdAreaDeportiva())
                 .nombreArea(a.getNombreArea())
                 .descripcionArea(a.getDescripcionArea())
@@ -251,7 +251,19 @@ public class AreaDeportivaServiceImpl implements IAreaDeportivaService {
                 .zona(convertZonaToDTO(a.getZona())) // objeto front K
                 .id(a.getAdministrador() != null ? a.getAdministrador().getId() : null)
                 .build();
+
+        // Cargar imágenes asociadas a la área
+        try {
+            List<com.espaciosdeportivos.dto.ImagenDTO> imagenes = imagenService.obtenerImagenesPorEntidad(ENTIDAD_TIPO, a.getIdAreaDeportiva());
+            dto.setImagenes(imagenes);
+        } catch (Exception e) {
+            log.warn("Error cargando imágenes para área {}: {}", a.getIdAreaDeportiva(), e.getMessage());
+            dto.setImagenes(java.util.List.of());
+        }
+
+        return dto;
     }
+
 
     private AreaDeportiva convertToEntity(AreaDeportivaDTO d) {
         Administrador administrador = administradorRepository.findById(d.getId())
