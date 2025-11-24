@@ -16,6 +16,9 @@ import com.espaciosdeportivos.repository.AdministradorRepository;
 
 import com.espaciosdeportivos.service.IAreaDeportivaService;
 import com.espaciosdeportivos.service.ImagenService;
+import com.espaciosdeportivos.repository.DisciplinaRepository;
+import com.espaciosdeportivos.model.Disciplina;
+import com.espaciosdeportivos.dto.DisciplinaDTO;
 import com.espaciosdeportivos.validation.AreaDeportivaValidator;
 
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +49,7 @@ public class AreaDeportivaServiceImpl implements IAreaDeportivaService {
     private final AreaDeportivaValidator areaDeportivaValidator;
 
     private final ImagenService imagenService;
+    private final DisciplinaRepository disciplinaRepository;
     private static final String ENTIDAD_TIPO = "AREADEPORTIVA";
 
 
@@ -313,6 +317,88 @@ public class AreaDeportivaServiceImpl implements IAreaDeportivaService {
                 .descripcion(z.getDescripcion())
                 .estado(z.getEstado())
                 .build();
+    }
+
+    // ------------------ Disciplina DTO converter ------------------
+    private com.espaciosdeportivos.dto.DisciplinaDTO convertDisciplinaToDTO(Disciplina disciplina) {
+        com.espaciosdeportivos.dto.DisciplinaDTO dto = com.espaciosdeportivos.dto.DisciplinaDTO.builder()
+                .idDisciplina(disciplina.getIdDisciplina())
+                .nombre(disciplina.getNombre())
+                .descripcion(disciplina.getDescripcion())
+                .estado(disciplina.getEstado())
+                .fechaCreacion(disciplina.getFechaCreacion())
+                .fechaActualizacion(disciplina.getFechaActualizacion())
+                .build();
+
+        try {
+            java.util.List<com.espaciosdeportivos.dto.ImagenDTO> imagenes = imagenService.obtenerImagenesPorEntidad("DISCIPLINA", disciplina.getIdDisciplina());
+            dto.setImagenes(imagenes);
+        } catch (Exception e) {
+            dto.setImagenes(java.util.List.of());
+            log.warn("Error cargando imágenes para disciplina {}: {}", disciplina.getIdDisciplina(), e.getMessage());
+        }
+
+        return dto;
+    }
+
+    @Override
+    public com.espaciosdeportivos.dto.DisciplinaDTO crearDisciplinaPorAdmin(Long adminId, com.espaciosdeportivos.dto.DisciplinaDTO dto) {
+        AreaDeportiva area = areaDeportivaRepository.findByAdministrador_Id(adminId)
+                .orElseThrow(() -> new RuntimeException("Área no encontrada para el administrador"));
+
+        if (dto.getNombre() == null || dto.getNombre().isBlank()) {
+            throw new RuntimeException("El nombre de la disciplina es obligatorio");
+        }
+
+
+        Disciplina disciplina = Disciplina.builder()
+                .nombre(dto.getNombre())
+                .descripcion(dto.getDescripcion())
+                .estado(dto.getEstado() != null ? dto.getEstado() : Boolean.TRUE)
+                .areaDeportiva(area)
+                .build();
+
+        disciplina = disciplinaRepository.save(disciplina);
+        return convertDisciplinaToDTO(disciplina);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<com.espaciosdeportivos.dto.DisciplinaDTO> listarDisciplinasPorAdmin(Long adminId) {
+        java.util.List<Disciplina> disciplinas = disciplinaRepository.findDisciplinasByAdminId(adminId);
+        return disciplinas.stream().map(this::convertDisciplinaToDTO).collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public com.espaciosdeportivos.dto.DisciplinaDTO actualizarDisciplinaPorAdmin(Long adminId, Long idDisciplina, com.espaciosdeportivos.dto.DisciplinaDTO dto) {
+        Disciplina d = disciplinaRepository.findById(idDisciplina)
+                .orElseThrow(() -> new RuntimeException("Disciplina no encontrada: " + idDisciplina));
+
+        if (d.getAreaDeportiva() == null || d.getAreaDeportiva().getAdministrador() == null ||
+                !d.getAreaDeportiva().getAdministrador().getId().equals(adminId)) {
+            throw new RuntimeException("La disciplina no pertenece al área del administrador");
+        }
+
+        d.setNombre(dto.getNombre());
+        d.setDescripcion(dto.getDescripcion());
+        d.setEstado(dto.getEstado() != null ? dto.getEstado() : d.getEstado());
+
+        Disciplina saved = disciplinaRepository.save(d);
+        return convertDisciplinaToDTO(saved);
+    }
+
+    @Override
+    public void eliminarDisciplinaPorAdmin(Long adminId, Long idDisciplina) {
+        Disciplina d = disciplinaRepository.findById(idDisciplina)
+                .orElseThrow(() -> new RuntimeException("Disciplina no encontrada: " + idDisciplina));
+
+        if (d.getAreaDeportiva() == null || d.getAreaDeportiva().getAdministrador() == null ||
+                !d.getAreaDeportiva().getAdministrador().getId().equals(adminId)) {
+            throw new RuntimeException("La disciplina no pertenece al área del administrador");
+        }
+
+        d.setEstado(Boolean.FALSE);
+        disciplinaRepository.save(d);
     }
 
     @Override

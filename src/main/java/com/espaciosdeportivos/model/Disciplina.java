@@ -21,7 +21,7 @@ public class Disciplina {
     @Column(name = "id_disciplina")
     private Long idDisciplina;
 
-    @Column(name = "nombre", nullable = false, unique = true)
+    @Column(name = "nombre", nullable = false)
     private String nombre;
 
     @Column(name = "descripcion", columnDefinition = "TEXT")
@@ -37,6 +37,11 @@ public class Disciplina {
     @UpdateTimestamp
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
+
+    // Relación directa con Área Deportiva K
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_areadeportiva", nullable = false)
+    private AreaDeportiva areaDeportiva;
 
     // Relaciones con Cancha (a través de la tabla intermedia se_practica)
 
