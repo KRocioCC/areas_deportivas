@@ -189,6 +189,8 @@ public class AdministradorServiceImpl implements AdministradorService {
         return mapToUsuarioControlDTO(usuarioControl);
     }
 
+    
+
     // --- Métodos privados de mapeo ---
     private AdministradorDTO mapToDTO(Administrador a) {
         return AdministradorDTO.builder()

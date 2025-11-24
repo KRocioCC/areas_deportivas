@@ -3,6 +3,7 @@ package com.espaciosdeportivos.service;
 import jakarta.validation.Valid;
 import com.espaciosdeportivos.dto.AreaDeportivaDTO;
 import com.espaciosdeportivos.dto.CanchaDTO;
+import com.espaciosdeportivos.dto.DisciplinaDTO;
 import com.espaciosdeportivos.model.AreaDeportiva;
 
 import java.util.List;
@@ -60,5 +61,13 @@ public interface IAreaDeportivaService {
     AreaDeportivaDTO agregarImagenes(Long idCancha, List<MultipartFile> archivosImagenes);
     AreaDeportivaDTO eliminarImagen(Long idCancha, Long idImagenRelacion);
     AreaDeportivaDTO reordenarImagenes(Long idCancha, List<Long> idsImagenesOrden);
+
+    // Gestión de disciplinas relacionadas con el área deportiva
+    DisciplinaDTO crearDisciplinaPorAdmin(Long adminId, DisciplinaDTO dto);
+    List<DisciplinaDTO> listarDisciplinasPorAdmin(Long adminId);
+    DisciplinaDTO actualizarDisciplinaPorAdmin(Long adminId, Long idDisciplina, DisciplinaDTO dto);
+    void eliminarDisciplinaPorAdmin(Long adminId, Long idDisciplina);
+
+
 
 }

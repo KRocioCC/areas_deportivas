@@ -34,4 +34,11 @@ public interface DisciplinaRepository extends JpaRepository<Disciplina, Long> {
     List<Disciplina> findByFechaCreacionAfterAndEstadoTrue(LocalDateTime fecha);
     //REVISAR SI FUNCIONAa
     List<Disciplina>findByEstadoTrueOrderByFechaCreacionDesc();
+
+    // Listar disciplinas por área deportiva
+    List<Disciplina> findByAreaDeportiva_IdAreaDeportiva(Long idAreaDeportiva);
+
+    // Listar disciplinas por administrador (a través del área)
+    @Query("SELECT d FROM Disciplina d WHERE d.areaDeportiva.administrador.id = :adminId AND d.estado = true")
+    List<Disciplina> findDisciplinasByAdminId(@Param("adminId") Long adminId);
 }
