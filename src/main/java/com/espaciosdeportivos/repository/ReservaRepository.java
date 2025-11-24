@@ -18,6 +18,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     // Búsquedas por Cliente (usando id_persona)
     List<Reserva> findByClienteId(Long clienteId);
+    
     List<Reserva> findByClienteIdAndEstadoReserva(Long clienteId, String estadoReserva);
     
     // Búsquedas por Estado

@@ -20,8 +20,8 @@ public interface ClienteService {
     ClienteDTO cambiarEstado(Long id, Boolean nuevoEstado);
 
         // Datos relacionados (¡aquí sí!)
-    /*List<ReservaDTO> obtenerReservasDeCliente(Long clienteId);
+    List<ReservaDTO> obtenerReservasDeCliente(Long clienteId);
     List<PagoDTO> obtenerPagosDeCliente(Long clienteId);
     List<QrDTO> obtenerQrsDeCliente(Long clienteId);
-    List<CancelacionDTO> obtenerCancelacionesDeCliente(Long clienteId);*/
+    /*List<CancelacionDTO> obtenerCancelacionesDeCliente(Long clienteId);*/
 }

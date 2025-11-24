@@ -3,6 +3,7 @@ package com.espaciosdeportivos.service;
 import com.espaciosdeportivos.dto.ReservaDTO;
 import com.espaciosdeportivos.model.Reserva;
 import com.espaciosdeportivos.dto.CancelacionDTO;
+import com.espaciosdeportivos.dto.QrDTO;
 import com.espaciosdeportivos.dto.ReprogramacionDTO;
 
 import java.time.LocalDate;
@@ -24,6 +25,9 @@ public interface IReservaService {
     ReservaDTO actualizar(Long id, ReservaDTO reservaDTO);
     void eliminar(Long id);
 
+    List<String> obtenerHorasDisponibles(Long idCancha, LocalDate fecha);
+    ReservaDTO actualizarEstadoPagoReserva(Long idReserva);
+
     //ReservaDTO crearReserva(ReservaDTO reservaDTO);
     //ReservaDTO reprogramarReserva(Long idReserva, ReprogramacionDTO nuevaReserva);
     //void cancelarReserva2(Long idReserva, CancelacionDTO cancelacionDTO);
@@ -32,6 +36,12 @@ public interface IReservaService {
     List<ReservaDTO> buscarPorCliente(Long idCliente);
     List<ReservaDTO> buscarPorEstado(String estado);
     List<ReservaDTO> buscarPorRangoFechas(LocalDate inicio, LocalDate fin);
+    List<ReservaDTO> buscarReservasActivasDelCliente(Long clienteId);
+    List<ReservaDTO> obtenerReservasDelDia(LocalDate fecha);
+    // Reservas por administrador en rango de fechas
+    List<ReservaDTO> buscarPorAdministradorEnRango(Long idAdministrador, LocalDate inicio, LocalDate fin);
+    //RESERVAS POR CLIETES
+    List<ReservaDTO> buscarTodasLasReservasDelCliente(Long clienteId);
     //ReservaDTO obtenerPorCodigoReserva(String codigoReserva);
     
     // Métodos de negocio
@@ -43,26 +53,16 @@ public interface IReservaService {
     
     // Validaciones y reportes
     boolean validarDisponibilidad(LocalDate fecha, LocalTime horaInicio, LocalTime horaFin);
-    List<ReservaDTO> buscarReservasActivasDelCliente(Long clienteId);
-    List<ReservaDTO> obtenerReservasDelDia(LocalDate fecha);
-    //List<ReservaDTO> obtenerReservasProximas();
-    //Double calcularIngresosEnRango(LocalDate inicio, LocalDate fin);
-    
-    // Utilidades
-    //String generarCodigoReserva();
     void validarFechaReserva(LocalDate fechaReserva);
 
-    //
-
-
+    //List<ReservaDTO> obtenerReservasProximas();
+    //Double calcularIngresosEnRango(LocalDate inicio, LocalDate fin);
+    // Utilidades
+    //String generarCodigoReserva();
     //List<Reserva> findReservaByCancha(Long idCancha);
-    
-    List<String> obtenerHorasDisponibles(Long idCancha, LocalDate fecha);
 
     //ReservaDTO crearReserva(ReservaDTO dto);
-    ReservaDTO actualizarEstadoPagoReserva(Long idReserva);
+    
 
-    // Reservas por administrador en rango de fechas
-    List<ReservaDTO> buscarPorAdministradorEnRango(Long idAdministrador, LocalDate inicio, LocalDate fin);
-   
+
 }

@@ -1,10 +1,16 @@
 package com.espaciosdeportivos.service.impl;
 
 import com.espaciosdeportivos.dto.ClienteDTO;
+import com.espaciosdeportivos.dto.PagoDTO;
+import com.espaciosdeportivos.dto.QrDTO;
+import com.espaciosdeportivos.dto.ReservaDTO;
 import com.espaciosdeportivos.model.Cliente;
 import com.espaciosdeportivos.repository.ClienteRepository;
 import com.espaciosdeportivos.service.ClienteService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.espaciosdeportivos.service.IReservaService;
+import com.espaciosdeportivos.service.IPagoService;
+import com.espaciosdeportivos.service.IQrService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,14 +18,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository clienteRepository;
-
-    @Autowired
-    public ClienteServiceImpl(ClienteRepository clienteRepository) {
-        this.clienteRepository = clienteRepository;
-    }
+    private final IReservaService reservaService;
+    private final IPagoService pagoService;
+    private final IQrService qrService;
 
     @Override
     @Transactional(readOnly = true)
@@ -159,6 +164,28 @@ public class ClienteServiceImpl implements ClienteService {
         cliente.setEstado(nuevoEstado);
         Cliente actualizado = clienteRepository.save(cliente);
         return mapToDTO(actualizado);
+    }
+
+    // ----- NUEVOS MÉTODOS RELACIONADOS (Reservas / Pagos / QRs) -----
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> obtenerReservasDeCliente(Long clienteId) {
+        // Delegar al servicio de reservas (ya mapea a DTOs)
+        return reservaService.buscarPorCliente(clienteId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PagoDTO> obtenerPagosDeCliente(Long clienteId) {
+        return pagoService.buscarPorCliente(clienteId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<QrDTO> obtenerQrsDeCliente(Long clienteId) {
+        // El servicio de QRs tiene un método por persona (cliente es una persona)
+        return qrService.obtenerQrsPorPersona(clienteId);
     }
 
     // --- Métodos privados de mapeo ---
