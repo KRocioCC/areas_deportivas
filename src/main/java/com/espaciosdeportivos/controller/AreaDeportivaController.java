@@ -1,6 +1,7 @@
 package com.espaciosdeportivos.controller;
 
 import com.espaciosdeportivos.dto.AreaDeportivaDTO;
+import com.espaciosdeportivos.dto.DisciplinaDTO;
 //import com.espaciosdeportivos.dto.CanchaDTO;
 import com.espaciosdeportivos.model.AreaDeportiva;
 import com.espaciosdeportivos.service.IAreaDeportivaService;
@@ -99,6 +100,48 @@ public class AreaDeportivaController {
         AreaDeportiva areaDeportiva = areaDeportivaservice.obtenerAreaDeportivaConBloqueo(id);
         return ResponseEntity.ok(areaDeportiva);
     }
+
+    // =====================
+// DISCIPLINAS POR ADMINISTRADOR
+// =====================
+
+@PostMapping("/admin/{adminId}/disciplinas")
+public ResponseEntity<DisciplinaDTO> crearDisciplinaPorAdmin(
+        @PathVariable("adminId") Long adminId,
+        @Valid @RequestBody DisciplinaDTO dto
+) {
+    DisciplinaDTO creado = areaDeportivaservice.crearDisciplinaPorAdmin(adminId, dto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+}
+
+@GetMapping("/admin/{adminId}/disciplinas")
+public ResponseEntity<List<DisciplinaDTO>> listarDisciplinasPorAdmin(
+        @PathVariable("adminId") Long adminId
+) {
+    List<DisciplinaDTO> lista = areaDeportivaservice.listarDisciplinasPorAdmin(adminId);
+    return ResponseEntity.ok(lista);
+}
+
+@PutMapping("/admin/{adminId}/disciplinas/{idDisciplina}")
+public ResponseEntity<DisciplinaDTO> actualizarDisciplinaPorAdmin(
+        @PathVariable("adminId") Long adminId,
+        @PathVariable("idDisciplina") Long idDisciplina,
+        @Valid @RequestBody DisciplinaDTO dto
+) {
+    DisciplinaDTO actualizado = areaDeportivaservice.actualizarDisciplinaPorAdmin(adminId, idDisciplina, dto);
+    return ResponseEntity.ok(actualizado);
+}
+
+@DeleteMapping("/admin/{adminId}/disciplinas/{idDisciplina}")
+public ResponseEntity<Void> eliminarDisciplinaPorAdmin(
+        @PathVariable("adminId") Long adminId,
+        @PathVariable("idDisciplina") Long idDisciplina
+) {
+    areaDeportivaservice.eliminarDisciplinaPorAdmin(adminId, idDisciplina);
+    return ResponseEntity.noContent().build();
+}
+
+
     //@PreAuthorize("hasRole('ROL_ADMIN')")
     //MI_AREA k
     @GetMapping("/admin/{adminId}")

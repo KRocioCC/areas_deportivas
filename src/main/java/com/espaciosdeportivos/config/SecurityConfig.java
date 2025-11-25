@@ -71,6 +71,11 @@ public class SecurityConfig {
                 // Autenticación
                 .requestMatchers("/api/auth/**").permitAll()
 
+                // Archivos e imágenes
+                .requestMatchers("/api/imagenes/archivo/**").permitAll()
+                .requestMatchers("/api/archivos/**").permitAll()
+                .requestMatchers("/img/**").permitAll()
+
                 // Lectura pública de canchas, áreas, disciplinas (solo GETs)
                 .requestMatchers(HttpMethod.GET, "/api/areasdeportivas/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/cancha/**").permitAll()
@@ -86,9 +91,7 @@ public class SecurityConfig {
                 //.requestMatchers("/api/disciplina/porid/**").permitAll()
                 //.requestMatchers("/api/disciplina/activos").permitAll()
 
-                // Imágenes y recursos estáticos
-                .requestMatchers("/img/**").permitAll() // 
-                .requestMatchers("/api/public/**").permitAll()
+                
 
                 // Swagger / OpenAPI
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
