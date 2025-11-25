@@ -16,50 +16,60 @@ public interface IReservaService {
 
     // CRUD básico
     List<ReservaDTO> listarTodas();
-    //listar reservas por idcliente
-    //List<ReservaDTO> listarPorCliente(Long idCliente);
+    // listar reservas por idcliente
+    // List<ReservaDTO> listarPorCliente(Long idCliente);
 
     ReservaDTO obtenerPorId(Long id);
+
     ReservaDTO crear(ReservaDTO reservaDTO);
+
     ReservaDTO actualizar(Long id, ReservaDTO reservaDTO);
+
     void eliminar(Long id);
 
-    //ReservaDTO crearReserva(ReservaDTO reservaDTO);
-    //ReservaDTO reprogramarReserva(Long idReserva, ReprogramacionDTO nuevaReserva);
-    //void cancelarReserva2(Long idReserva, CancelacionDTO cancelacionDTO);
-    
+    // ReservaDTO crearReserva(ReservaDTO reservaDTO);
+    // ReservaDTO reprogramarReserva(Long idReserva, ReprogramacionDTO
+    // nuevaReserva);
+    // void cancelarReserva2(Long idReserva, CancelacionDTO cancelacionDTO);
+
     // Búsquedas
     List<ReservaDTO> buscarPorCliente(Long idCliente);
+
     List<ReservaDTO> buscarPorEstado(String estado);
+
     List<ReservaDTO> buscarPorRangoFechas(LocalDate inicio, LocalDate fin);
-    //ReservaDTO obtenerPorCodigoReserva(String codigoReserva);
-    
+    // ReservaDTO obtenerPorCodigoReserva(String codigoReserva);
+
     // Métodos de negocio
-    //ReservaDTO confirmarReserva(Long idReserva);
+    // ReservaDTO confirmarReserva(Long idReserva);
     ReservaDTO cancelarReserva(Long idReserva, String motivo);
+
     ReservaDTO marcarComoEnCurso(Long idReserva);
+
     ReservaDTO marcarComoCompletada(Long idReserva);
+
     ReservaDTO marcarComoNoShow(Long idReserva);
-    
+
     // Validaciones y reportes
     boolean validarDisponibilidad(LocalDate fecha, LocalTime horaInicio, LocalTime horaFin);
+
     List<ReservaDTO> buscarReservasActivasDelCliente(Long clienteId);
+
     List<ReservaDTO> obtenerReservasDelDia(LocalDate fecha);
-    //List<ReservaDTO> obtenerReservasProximas();
-    //Double calcularIngresosEnRango(LocalDate inicio, LocalDate fin);
-    
+    // List<ReservaDTO> obtenerReservasProximas();
+    // Double calcularIngresosEnRango(LocalDate inicio, LocalDate fin);
+
     // Utilidades
-    //String generarCodigoReserva();
+    // String generarCodigoReserva();
     void validarFechaReserva(LocalDate fechaReserva);
 
     //
 
+    // List<Reserva> findReservaByCancha(Long idCancha);
 
-    //List<Reserva> findReservaByCancha(Long idCancha);
-    
     List<String> obtenerHorasDisponibles(Long idCancha, LocalDate fecha);
 
-    //ReservaDTO crearReserva(ReservaDTO dto);
+    // ReservaDTO crearReserva(ReservaDTO dto);
     ReservaDTO actualizarEstadoPagoReserva(Long idReserva);
 
     // Reservas por administrador en rango de fechas
@@ -67,5 +77,8 @@ public interface IReservaService {
 
     // Listar reservas por cancha k
     List<ReservaDTO> listarReservasPorCancha(Long idCancha);
-   
+
+    // --- NUEVO MÉTODO PARA EL REPORTE DE PAGOS ---
+    List<ReservaDTO> buscarTodasPorAdministrador(Long idAdministrador);
+
 }

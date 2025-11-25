@@ -45,7 +45,6 @@ public class ReservaController {
         return ResponseEntity.ok(reserva);
     }
 
-
     @PostMapping
     public ResponseEntity<ReservaDTO> crear(@Valid @RequestBody ReservaDTO dto) {
         ReservaDTO reservaCreada = reservaService.crear(dto);
@@ -82,7 +81,7 @@ public class ReservaController {
             @RequestParam("inicio") String inicio,
             @RequestParam("fin") String fin) {
         List<ReservaDTO> reservas = reservaService.buscarPorRangoFechas(
-            LocalDate.parse(inicio), LocalDate.parse(fin));
+                LocalDate.parse(inicio), LocalDate.parse(fin));
         return ResponseEntity.ok(reservas);
     }
 
@@ -109,7 +108,6 @@ public class ReservaController {
         return ResponseEntity.ok(horasDisponibles);
     }
 
-
     @PostMapping("/{id}/en-curso")
     public ResponseEntity<ReservaDTO> marcarEnCurso(@PathVariable Long id) {
         ReservaDTO reservaEnCurso = reservaService.marcarComoEnCurso(id);
@@ -135,10 +133,9 @@ public class ReservaController {
             @RequestParam String horaInicio,
             @RequestParam String horaFin) {
         boolean disponible = reservaService.validarDisponibilidad(
-            LocalDate.parse(fecha), 
-            LocalTime.parse(horaInicio), 
-            LocalTime.parse(horaFin)
-        );
+                LocalDate.parse(fecha),
+                LocalTime.parse(horaInicio),
+                LocalTime.parse(horaFin));
         return ResponseEntity.ok(Map.of("disponible", disponible));
     }
 
@@ -148,27 +145,31 @@ public class ReservaController {
         return ResponseEntity.ok(reservas);
     }
 
+    /*
+     * @GetMapping("/proximas")
+     * public ResponseEntity<List<ReservaDTO>> obtenerReservasProximas() {
+     * List<ReservaDTO> reservas = reservaService.obtenerReservasProximas();
+     * return ResponseEntity.ok(reservas);
+     * }
+     */
 
-
-    /*@GetMapping("/proximas")
-    public ResponseEntity<List<ReservaDTO>> obtenerReservasProximas() {
-        List<ReservaDTO> reservas = reservaService.obtenerReservasProximas();
-        return ResponseEntity.ok(reservas);
-    }*/
-
-    /*@GetMapping("/reporte/ingresos")
-    public ResponseEntity<Map<String, Object>> calcularIngresos(
-            @RequestParam String inicio,
-            @RequestParam String fin) {
-        Double ingresos = reservaService.calcularIngresosEnRango(
-            LocalDate.parse(inicio), LocalDate.parse(fin));
-        return ResponseEntity.ok(Map.of(
-            "inicio", inicio,
-            "fin", fin,
-            "ingresos", ingresos,
-            "moneda", "BOB"
-        ));
-    }*/
+    /*
+     * @GetMapping("/reporte/ingresos")
+     * public ResponseEntity<Map<String, Object>> calcularIngresos(
+     * 
+     * @RequestParam String inicio,
+     * 
+     * @RequestParam String fin) {
+     * Double ingresos = reservaService.calcularIngresosEnRango(
+     * LocalDate.parse(inicio), LocalDate.parse(fin));
+     * return ResponseEntity.ok(Map.of(
+     * "inicio", inicio,
+     * "fin", fin,
+     * "ingresos", ingresos,
+     * "moneda", "BOB"
+     * ));
+     * }
+     */
 
     // HEALTH CHECK
     @GetMapping("/health")
@@ -178,14 +179,14 @@ public class ReservaController {
 
     @PostMapping("/{id}/cancelar")
     public ResponseEntity<ReservaDTO> cancelarReserva(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @RequestBody Map<String, String> request) {
         String motivo = request.get("motivo");
         ReservaDTO reservaCancelada = reservaService.cancelarReserva(id, motivo);
         return ResponseEntity.ok(reservaCancelada);
     }
 
-    /*este es el mas importnate que sirve para la generacion de qr y reserva */
+    /* este es el mas importnate que sirve para la generacion de qr y reserva */
     @PutMapping("/{id}/actualizar-pago")
     public ResponseEntity<?> actualizarEstadoPago(@PathVariable Long id) {
         try {
@@ -194,25 +195,31 @@ public class ReservaController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar el estado de pago.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al actualizar el estado de pago.");
         }
     }
 
-    /*@GetMapping("/codigo/{codigo}")
-    public ResponseEntity<ReservaDTO> obtenerPorCodigo(@PathVariable String codigo) {
-        ReservaDTO reserva = reservaService.obtenerPorCodigoReserva(codigo);
-        return ResponseEntity.ok(reserva);
-    }*/
+    /*
+     * @GetMapping("/codigo/{codigo}")
+     * public ResponseEntity<ReservaDTO> obtenerPorCodigo(@PathVariable String
+     * codigo) {
+     * ReservaDTO reserva = reservaService.obtenerPorCodigoReserva(codigo);
+     * return ResponseEntity.ok(reserva);
+     * }
+     */
 
     // OPERACIONES DE NEGOCIO
-    /*@PostMapping("/{id}/confirmar")
-    public ResponseEntity<ReservaDTO> confirmarReserva(@PathVariable Long id) {
-        ReservaDTO reservaConfirmada = reservaService.confirmarReserva(id);
-        return ResponseEntity.ok(reservaConfirmada);
-    }*/
+    /*
+     * @PostMapping("/{id}/confirmar")
+     * public ResponseEntity<ReservaDTO> confirmarReserva(@PathVariable Long id) {
+     * ReservaDTO reservaConfirmada = reservaService.confirmarReserva(id);
+     * return ResponseEntity.ok(reservaConfirmada);
+     * }
+     */
 
     // RESERVAS POR ADMINISTRADOR EN RANGO DE FECHAS
-    //PAra administrador ver sus reservas en rango de fechas k
+    // PAra administrador ver sus reservas en rango de fechas k
     @GetMapping("/administrador/{idAdministrador}/rango-fechas")
     public ResponseEntity<List<ReservaDTO>> buscarPorAdministradorEnRango(
             @PathVariable Long idAdministrador,
@@ -224,20 +231,29 @@ public class ReservaController {
     }
 
     // Listar reservas por cancha k
-    /*@GetMapping("/{idCancha}/reservas")
-    public ResponseEntity<List<Reserva>> obtenerReservasPorCancha(@PathVariable Long idCancha) {
-        List<Reserva> reservas = reservaService.listarReservasPorCancha(idCancha);
-        return ResponseEntity.ok(reservas);
-    }/* */
-
-    
+    /*
+     * @GetMapping("/{idCancha}/reservas")
+     * public ResponseEntity<List<Reserva>> obtenerReservasPorCancha(@PathVariable
+     * Long idCancha) {
+     * List<Reserva> reservas = reservaService.listarReservasPorCancha(idCancha);
+     * return ResponseEntity.ok(reservas);
+     * }/*
+     */
 
     // Listar reservas por cancha k
-@GetMapping("/{idCancha}/reservas")
-public ResponseEntity<List<ReservaDTO>> obtenerReservasPorCancha(@PathVariable Long idCancha) {
-    List<ReservaDTO> reservas = reservaService.listarReservasPorCancha(idCancha);
-    return ResponseEntity.ok(reservas);
-}
+    @GetMapping("/{idCancha}/reservas")
+    public ResponseEntity<List<ReservaDTO>> obtenerReservasPorCancha(@PathVariable Long idCancha) {
+        List<ReservaDTO> reservas = reservaService.listarReservasPorCancha(idCancha);
+        return ResponseEntity.ok(reservas);
+    }
 
-       
+    // --- NUEVO ENDPOINT PARA REPORTE DE PAGOS (ESTO ES LO QUE FALTABA) ---
+    @GetMapping("/admin/{idAdmin}")
+    public ResponseEntity<List<ReservaDTO>> getReservasByAdmin(@PathVariable Long idAdmin) {
+        // Llama al método que busca TODAS las reservas del admin (sin filtro de fecha)
+        // Esto permitirá ver el historial completo de pagos
+        List<ReservaDTO> reservas = reservaService.buscarTodasPorAdministrador(idAdmin);
+        return ResponseEntity.ok(reservas);
+    }
+
 }
