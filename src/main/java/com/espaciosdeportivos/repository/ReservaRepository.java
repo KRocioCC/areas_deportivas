@@ -126,4 +126,10 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
            "WHERE i.cancha.idCancha = :idCancha")
        List<Reserva> findAllByCanchaId(@Param("idCancha") Long idCancha);
 
+       // OPCIÓN A: Usando @Query si la relación es vía INCLUYE
+       @Query("SELECT r FROM Reserva r " +
+                     "JOIN Incluye i ON i.reserva.id = r.id " +
+                     "WHERE i.cancha.areaDeportiva.administrador.id = :idAdmin")
+       List<Reserva> findByCancha_AreaDeportiva_Administrador_Id(@Param("idAdmin") Long idAdmin);
+
 }

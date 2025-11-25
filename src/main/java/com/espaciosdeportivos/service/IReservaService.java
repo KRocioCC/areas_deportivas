@@ -65,4 +65,7 @@ public interface IReservaService {
 
        // Listar reservas por cancha k
     List<ReservaDTO> listarReservasPorCancha(Long idCancha);
+
+    // --- NUEVO MÉTODO PARA EL REPORTE DE PAGOS ---
+    List<ReservaDTO> buscarTodasPorAdministrador(Long idAdministrador);
 }

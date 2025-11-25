@@ -245,5 +245,13 @@ public ResponseEntity<List<ReservaDTO>> obtenerReservasPorCancha(@PathVariable L
     return ResponseEntity.ok(reservas);
 }
 
+// --- NUEVO ENDPOINT PARA REPORTE DE PAGOS (ESTO ES LO QUE FALTABA) ---
+@GetMapping("/admin/{idAdmin}")
+public ResponseEntity<List<ReservaDTO>> getReservasByAdmin(@PathVariable Long idAdmin) {
+    // Llama al método que busca TODAS las reservas del admin (sin filtro de fecha)
+    // Esto permitirá ver el historial completo de pagos
+    List<ReservaDTO> reservas = reservaService.buscarTodasPorAdministrador(idAdmin);
+    return ResponseEntity.ok(reservas);
+}
        
 }

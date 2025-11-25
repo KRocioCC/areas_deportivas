@@ -677,5 +677,18 @@ public List<ReservaDTO> listarReservasPorCancha(Long idCancha) {
             .map(this::convertToDTO) // usa el mismo convertToDTO que ya tienes
             .collect(Collectors.toList());
 }
+// --- IMPLEMENTACIÓN DEL NUEVO MÉTODO PARA PAGOS ---
+@Override
+@Transactional(readOnly = true)
+public List<ReservaDTO> buscarTodasPorAdministrador(Long idAdministrador) {
+    // Esta consulta busca todas las reservas donde la cancha pertenece a un área
+    // del admin
+    // Asegúrate de tener este método en tu ReservaRepository o usa uno equivalente
+    List<Reserva> reservas = reservaRepository.findByCancha_AreaDeportiva_Administrador_Id(idAdministrador);
+
+    return reservas.stream()
+            .map(this::convertToDTO) // Tu convertToDTO ya carga los pagos, así que estamos listos
+            .collect(Collectors.toList());
+}
 
 }
