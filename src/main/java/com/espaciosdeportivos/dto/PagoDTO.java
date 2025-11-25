@@ -19,7 +19,7 @@ public class PagoDTO implements Serializable {
     private Double monto;
 
     @NotNull(message = "La fecha del pago es obligatoria")
-    @PastOrPresent(message = "La fecha del pago no puede ser futura")
+    //@PastOrPresent(message = "La fecha del pago no puede ser futura") lo quite por que esta desfasado nos saldra mas errorres
     private LocalDate fecha;
 
     @NotBlank(message = "El tipo de pago no puede estar vacío")

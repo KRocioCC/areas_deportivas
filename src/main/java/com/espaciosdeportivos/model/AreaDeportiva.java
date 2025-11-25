@@ -80,6 +80,10 @@ public class AreaDeportiva {
     @OneToMany(mappedBy = "areaDeportiva",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Cancha> cancha;
 
+    @OneToMany(mappedBy = "areaDeportiva", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+private List<Disciplina> disciplinas;
+
+
 
     
 }

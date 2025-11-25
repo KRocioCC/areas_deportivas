@@ -20,4 +20,7 @@ public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
 
     // Buscar comentarios recientes
     List<Comentario> findAllByOrderByFechaDesc();
+
+
+    
 }

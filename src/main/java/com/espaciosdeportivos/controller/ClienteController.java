@@ -1,6 +1,9 @@
 package com.espaciosdeportivos.controller;
 
 import com.espaciosdeportivos.dto.ClienteDTO;
+import com.espaciosdeportivos.dto.ReservaDTO;
+import com.espaciosdeportivos.dto.PagoDTO;
+import com.espaciosdeportivos.dto.QrDTO;
 import com.espaciosdeportivos.service.ClienteService;
 
 import jakarta.validation.Valid;
@@ -62,5 +65,22 @@ public class ClienteController {
     @PatchMapping("/{id}/estado")
     public ClienteDTO cambiarEstado(@PathVariable Long id, @RequestParam Boolean estado) {
         return clienteService.cambiarEstado(id, estado);
+    }
+
+    // ----- Endpoints adicionales para consultar recursos asociados al cliente -----
+
+    @GetMapping("/{id}/reservas")
+    public List<ReservaDTO> obtenerReservasDeCliente(@PathVariable Long id) {
+        return clienteService.obtenerReservasDeCliente(id);
+    }
+
+    @GetMapping("/{id}/pagos")
+    public List<PagoDTO> obtenerPagosDeCliente(@PathVariable Long id) {
+        return clienteService.obtenerPagosDeCliente(id);
+    }
+
+    @GetMapping("/{id}/qrs")
+    public List<QrDTO> obtenerQrsDeCliente(@PathVariable Long id) {
+        return clienteService.obtenerQrsDeCliente(id);
     }
 }

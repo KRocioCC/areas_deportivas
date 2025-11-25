@@ -90,4 +90,9 @@ public class ComentarioController {
         logger.info("[COMENTARIO] Fin eliminarComentarioFisicamente");
         return ResponseEntity.ok("Comentario eliminado físicamente");
     }
+    @GetMapping("/cancha/{canchaId}")
+    public ResponseEntity<List<ComentarioDTO>> getComentariosPorCancha(@PathVariable Long canchaId) {
+        List<ComentarioDTO> comentarios = comentarioService.getComentariosPorCancha(canchaId);
+        return ResponseEntity.ok(comentarios);
+    }
 }
