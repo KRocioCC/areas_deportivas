@@ -22,8 +22,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.validation.Valid;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -124,6 +127,16 @@ public class ComentarioServiceImpl implements IComentarioService {
         return comentario;
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosPorCancha(Long canchaId) {
+        return comentarioRepository.findByCancha_IdCancha(canchaId)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     // ---------- mapping ----------
     private ComentarioDTO convertToDTO(Comentario c) {
         Persona p = c.getPersona();
@@ -156,7 +169,7 @@ public class ComentarioServiceImpl implements IComentarioService {
                 .idComentario(d.getIdComentario())
                 .contenido(d.getContenido())
                 .calificacion(d.getCalificacion())
-                .fecha(d.getFecha())
+                .fecha(d.getFecha() != null ? d.getFecha() : LocalDateTime.now())
                 .estado(d.getEstado() != null ? d.getEstado() : Boolean.TRUE)
                 .persona(persona)
                 .cancha(cancha)

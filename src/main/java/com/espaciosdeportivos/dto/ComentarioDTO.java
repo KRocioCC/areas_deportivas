@@ -23,7 +23,7 @@ public class ComentarioDTO implements Serializable {
     @Max(value = 5, message = "La calificación máxima es 5")
     private Integer calificacion;
 
-    @NotNull(message = "La fecha del comentario es obligatoria")
+    //@NotNull(message = "La fecha del comentario es obligatoria")
     private LocalDateTime fecha;
 
     @NotNull(message = "El ID de la persona es obligatorio")
@@ -32,7 +32,7 @@ public class ComentarioDTO implements Serializable {
     @NotNull(message = "El ID de la cancha es obligatorio")
     private Long idCancha;
 
-    @NotNull(message = "El estado del comentario es obligatorio")
+    //@NotNull(message = "El estado del comentario es obligatorio")
     private Boolean estado;
 
     private PersonaPublicaDTO persona; 
