@@ -46,6 +46,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.time.Duration;
@@ -364,6 +365,59 @@ public class ReservaServiceImpl implements IReservaService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    //AGREGUE NUEVAS ENPOINTS
+    // Buscar por cliente y estado
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> buscarPorClienteYEstado(Long clienteId, String estado) {
+        return reservaRepository.findByClienteIdAndEstadoReserva(clienteId, estado)
+                .stream().map(this::convertToDTO).toList();
+    }
+
+    // Ordenar por fecha de creación (asc / desc)
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> ordenarPorFechaCreacionAsc() {
+        return reservaRepository.findAllByOrderByFechaCreacionAsc()
+                .stream().map(this::convertToDTO).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> ordenarPorFechaCreacionDesc() {
+        return reservaRepository.findAllByOrderByFechaCreacionDesc()
+                .stream().map(this::convertToDTO).toList();
+    }
+
+    // Listar invitados (devuelve lista de IDs)
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> listarInvitados(Long idReserva) {
+        var invitados = participaRepository.findByReserva_IdReserva(idReserva);
+
+        return invitados.stream()
+                .map(p -> p.getInvitado() != null ? p.getInvitado().getId() : null)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    // Buscar por nombre de cancha usando el query que añadiste al repo
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> buscarPorNombreCancha(String nombre) {
+        return reservaRepository.findByNombreCancha(nombre)
+                .stream().map(this::convertToDTO).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Reserva> findByClienteIdAndEstadoReserva(Long clienteId, String estadoReserva) {
+        return reservaRepository.findByClienteIdAndEstadoReserva(clienteId, estadoReserva);
+    }
+
+
+
 
 
     // ======================

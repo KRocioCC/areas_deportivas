@@ -81,6 +81,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/cancha/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/disciplina/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/cancha/equipamientos/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/comentario/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/comentario/cancha/**").permitAll()
 
                 //.requestMatchers("/api/areasdeportivas/**").permitAll()//validar mejor es que yo necesito las ctivas y listar areas deportivas por id eso necsito
                 //.requestMatchers("/api/cancha/area/**").permitAll()
