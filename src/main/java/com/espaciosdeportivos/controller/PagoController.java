@@ -80,7 +80,7 @@ public class PagoController {
             @RequestParam("inicio") String inicio,
             @RequestParam("fin") String fin) {
         List<PagoDTO> pagos = pagoService.buscarPorRangoFechas(
-            LocalDate.parse(inicio), LocalDate.parse(fin));
+                LocalDate.parse(inicio), LocalDate.parse(fin));
         return ResponseEntity.ok(pagos);
     }
 
@@ -98,7 +98,7 @@ public class PagoController {
 
     @GetMapping("/reserva/{idReserva}/estado/{estado}")
     public ResponseEntity<List<PagoDTO>> buscarPorReservaYEstado(
-            @PathVariable Long idReserva, 
+            @PathVariable Long idReserva,
             @PathVariable String estado) {
         List<PagoDTO> pagos = pagoService.buscarPorReservaYEstado(idReserva, estado);
         return ResponseEntity.ok(pagos);
@@ -151,10 +151,9 @@ public class PagoController {
     public ResponseEntity<Map<String, Object>> obtenerTotalPorFecha(@RequestParam String fecha) {
         Double total = pagoService.obtenerTotalPagosConfirmadosPorFecha(LocalDate.parse(fecha));
         return ResponseEntity.ok(Map.of(
-            "fecha", fecha, 
-            "total", total,
-            "moneda", "BOB"
-        ));
+                "fecha", fecha,
+                "total", total,
+                "moneda", "BOB"));
     }
 
     @GetMapping("/reporte/total-por-rango")
@@ -162,13 +161,12 @@ public class PagoController {
             @RequestParam String inicio,
             @RequestParam String fin) {
         Double total = pagoService.obtenerTotalPagosConfirmadosPorRango(
-            LocalDate.parse(inicio), LocalDate.parse(fin));
+                LocalDate.parse(inicio), LocalDate.parse(fin));
         return ResponseEntity.ok(Map.of(
-            "inicio", inicio,
-            "fin", fin,
-            "total", total,
-            "moneda", "BOB"
-        ));
+                "inicio", inicio,
+                "fin", fin,
+                "total", total,
+                "moneda", "BOB"));
     }
 
     @GetMapping("/reporte/pagos-confirmados")
@@ -176,7 +174,7 @@ public class PagoController {
             @RequestParam String inicio,
             @RequestParam String fin) {
         List<PagoDTO> pagos = pagoService.obtenerPagosConfirmadosEnRango(
-            LocalDate.parse(inicio), LocalDate.parse(fin));
+                LocalDate.parse(inicio), LocalDate.parse(fin));
         return ResponseEntity.ok(pagos);
     }
 
@@ -184,10 +182,9 @@ public class PagoController {
     public ResponseEntity<Map<String, Object>> obtenerSaldoPendiente(@PathVariable Long idReserva) {
         Double saldoPendiente = pagoService.obtenerSaldoPendienteReserva(idReserva);
         return ResponseEntity.ok(Map.of(
-            "idReserva", idReserva,
-            "saldoPendiente", saldoPendiente,
-            "moneda", "BOB"
-        ));
+                "idReserva", idReserva,
+                "saldoPendiente", saldoPendiente,
+                "moneda", "BOB"));
     }
 
     // ENDPOINTS DE VALIDACIÓN

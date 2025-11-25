@@ -27,13 +27,11 @@ public class PagoDTO implements Serializable {
     private String tipoPago;
 
     @NotBlank(message = "El método de pago no puede estar vacío")
-    @Pattern(regexp = "EFECTIVO|TARJETA_CREDITO|TARJETA_DEBITO|TRANSFERENCIA|QR", 
-             message = "Método de pago no válido")
+    @Pattern(regexp = "EFECTIVO|TARJETA_CREDITO|TARJETA_DEBITO|TRANSFERENCIA|QR", message = "Método de pago no válido")
     private String metodoPago;
 
     @NotBlank(message = "El estado del pago no puede estar vacío")
-    @Pattern(regexp = "PENDIENTE|CONFIRMADO|ANULADO|RECHAZADO", 
-             message = "Estado de pago no válido")
+    @Pattern(regexp = "PENDIENTE|CONFIRMADO|ANULADO|RECHAZADO", message = "Estado de pago no válido")
     private String estado;
 
     @Size(max = 100, message = "El código de transacción no puede exceder los 100 caracteres")
@@ -47,19 +45,21 @@ public class PagoDTO implements Serializable {
 
     @NotNull(message = "El ID de la cliente es obligatorio")
     private Long clienteId;
-    
-    //objeto
+
+    // objeto
     private ClienteDTO cliente;
 
     // Campos de solo lectura (respuesta)
-    /*private LocalDate fechaCreacion;
-    private LocalDate fechaActualizacion;
-    private String codigoReserva;
-    private LocalDate fechaReserva;
-    private Long idCliente;
-    private String nombreCliente;
-    private String emailCliente;
-    private String telefonoCliente;
-    private Double montoTotalReserva;
-    private Double saldoPendiente;*/
+    /*
+     * private LocalDate fechaCreacion;
+     * private LocalDate fechaActualizacion;
+     * private String codigoReserva;
+     * private LocalDate fechaReserva;
+     * private Long idCliente;
+     * private String nombreCliente;
+     * private String emailCliente;
+     * private String telefonoCliente;
+     * private Double montoTotalReserva;
+     * private Double saldoPendiente;
+     */
 }
