@@ -20,4 +20,7 @@ public interface IComentarioService {
     Comentario obtenerComentarioConBloqueo(Long id);
 
     void eliminarComentarioFisicamente(Long id);
+    
+    List<ComentarioDTO> getComentariosPorCancha(Long canchaId);
+
 }

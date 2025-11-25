@@ -40,7 +40,7 @@ public class ComentarioValidator {
         validarContenido(comentarioDTO.getContenido());
         validarCalificacion(comentarioDTO.getCalificacion());
         //validarFecha(comentarioDTO.getFecha());
-        validarEstado(comentarioDTO.getEstado());
+        //validarEstado(comentarioDTO.getEstado());
     }
 
     public static class BusinessException extends RuntimeException {
