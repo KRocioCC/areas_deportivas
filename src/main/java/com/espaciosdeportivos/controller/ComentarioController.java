@@ -90,9 +90,72 @@ public class ComentarioController {
         logger.info("[COMENTARIO] Fin eliminarComentarioFisicamente");
         return ResponseEntity.ok("Comentario eliminado físicamente");
     }
-    @GetMapping("/cancha/{canchaId}")
+    /*@GetMapping("/cancha/{canchaId}")
     public ResponseEntity<List<ComentarioDTO>> getComentariosPorCancha(@PathVariable Long canchaId) {
         List<ComentarioDTO> comentarios = comentarioService.getComentariosPorCancha(canchaId);
         return ResponseEntity.ok(comentarios);
+    }*/
+
+    // ---------- OBTENER POR ID ----------
+    /*@GetMapping("/{id}")
+    public ResponseEntity<ComentarioDTO> obtenerPorId(@PathVariable Long id) {
+        logger.info("Obteniendo comentario por ID: {}", id);
+        ComentarioDTO dto = comentarioService.obtenerComentarioPorId(id);
+        return ResponseEntity.ok(dto);
+    }*/
+
+    // ---------- OBTENER COMENTARIOS POR CANCHA ----------
+    @GetMapping("/cancha/{canchaId}")
+    public ResponseEntity<List<ComentarioDTO>> comentariosPorCancha(@PathVariable Long canchaId) {
+        logger.info("Obteniendo comentarios de la cancha ID: {}", canchaId);
+        List<ComentarioDTO> lista = comentarioService.getComentariosPorCancha(canchaId);
+        return ResponseEntity.ok(lista);
+    }
+
+    // ---------- OBTENER COMENTARIOS POR CLIENTE ----------
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<List<ComentarioDTO>> comentariosPorCliente(@PathVariable Long clienteId) {
+        logger.info("Obteniendo comentarios del cliente ID: {}", clienteId);
+        List<ComentarioDTO> lista = comentarioService.getComentariosPorCliente(clienteId);
+        return ResponseEntity.ok(lista);
+    }
+
+    // ---------- OBTENER COMENTARIOS MÁS RECIENTES ----------
+    @GetMapping("/recientes")
+    public ResponseEntity<List<ComentarioDTO>> comentariosMasRecientes() {
+        logger.info("Obteniendo comentarios más recientes");
+        List<ComentarioDTO> lista = comentarioService.getComentariosMasRecientes(10);
+        return ResponseEntity.ok(lista);
+    }
+    // ---------- OBTENER COMENTARIOS CON MAYOR CALIFICACIÓN ----------
+    @GetMapping("/mayor-calificacion")
+    public ResponseEntity<List<ComentarioDTO>> comentariosMayorCalificacion() {
+        logger.info("Obteniendo comentarios con mayor calificación");
+        List<ComentarioDTO> lista = comentarioService.getComentariosMayorCalificacion(10);
+        return ResponseEntity.ok(lista);
+    }
+
+    // ---------- OBTENER COMENTARIOS CON MAYOR CALIFICACIÓN Y MÁS RECIENTES ----------
+    @GetMapping("/mayor-calificacion-recientes")
+    public ResponseEntity<List<ComentarioDTO>> comentariosMayorCalificacionRecientes() {
+        logger.info("Obteniendo comentarios con mayor calificación y recientes");
+        List<ComentarioDTO> lista = comentarioService.getComentariosMayorCalificacionMasRecientes(10);  // ✅ AGREGAR 10
+        return ResponseEntity.ok(lista);
+    }
+
+    // ---------- OBTENER COMENTARIOS POR CALIFICACIÓN ESPECÍFICA ----------
+    @GetMapping("/calificacion/{calificacion}")
+    public ResponseEntity<List<ComentarioDTO>> comentariosPorCalificacion(@PathVariable Integer calificacion) {
+        logger.info("Obteniendo comentarios con calificación: {}", calificacion);
+        List<ComentarioDTO> lista = comentarioService.getComentariosPorCalificacion(calificacion);
+        return ResponseEntity.ok(lista);
+    }
+
+    // ---------- OBTENER COMENTARIOS POR ÁREA DEPORTIVA ----------
+    @GetMapping("/area/{areaId}")
+    public ResponseEntity<List<ComentarioDTO>> comentariosPorArea(@PathVariable Long areaId) {
+        logger.info("Obteniendo comentarios del área deportiva ID: {}", areaId);
+        List<ComentarioDTO> lista = comentarioService.getComentariosPorAreaDeportiva(areaId);
+        return ResponseEntity.ok(lista);
     }
 }

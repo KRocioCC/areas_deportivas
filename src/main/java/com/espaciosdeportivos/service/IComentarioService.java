@@ -23,4 +23,23 @@ public interface IComentarioService {
     
     List<ComentarioDTO> getComentariosPorCancha(Long canchaId);
 
+    // NUEVOS ENDPOINTS GET
+    // Obtener comentarios más recientes
+    List<ComentarioDTO> getComentariosMasRecientes(int limite);
+
+    // Obtener comentarios con mayor puntuación
+    List<ComentarioDTO> getComentariosMayorCalificacion(int limite);
+
+    // Obtener comentarios con mayor puntuación y recientes
+    List<ComentarioDTO> getComentariosMayorCalificacionMasRecientes(int limite);
+
+    // Listar comentarios por calificación exacta
+    List<ComentarioDTO> getComentariosPorCalificacion(int calificacion);
+
+    // Listar comentarios de un cliente
+    List<ComentarioDTO> getComentariosPorCliente(Long clienteId);
+
+    // Listar comentarios por área deportiva
+    List<ComentarioDTO> getComentariosPorAreaDeportiva(Long areaDeportivaId);
+
 }
