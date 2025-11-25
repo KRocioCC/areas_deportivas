@@ -72,8 +72,10 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     //List<Reserva> findReservaByCancha(Long idCancha);
 
-    @Query("SELECT r FROM Reserva r WHERE r.fechaReserva = :fecha AND r.idReserva IN " +
-       "(SELECT i.reserva.idReserva FROM Incluye i WHERE i.cancha.idCancha = :idCancha)")
+    @Query("SELECT r FROM Reserva r WHERE r.fechaReserva = :fecha " +
+           "AND r.estadoReserva NOT IN ('CANCELADA', 'NO_SHOW') " +
+           "AND r.idReserva IN " +
+           "(SELECT i.reserva.idReserva FROM Incluye i WHERE i.cancha.idCancha = :idCancha)")
     List<Reserva> findByCanchaAndFecha(@Param("idCancha") Long idCancha, @Param("fecha") LocalDate fecha);
 
       /* @Query("""
