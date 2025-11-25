@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,4 +60,60 @@ public interface CanchaRepository extends JpaRepository<Cancha, Long> {
         @Param("idCancha") Long idCancha,
         @Param("idAreaDeportiva") Long idArea
     );
+
+     // 1. Canchas con promedio de calificaciones más altas
+    @Query("SELECT c FROM Cancha c LEFT JOIN c.comentario com " +
+            "GROUP BY c " +
+            "ORDER BY AVG(com.calificacion) DESC")
+    List<Cancha> findCanchasMejorCalificadas();
+
+    // 2. Canchas con mayor número de reservas
+    @Query("SELECT c FROM Cancha c LEFT JOIN c.incluidos i " +
+            "GROUP BY c " +
+            "ORDER BY COUNT(i) DESC")
+    List<Cancha> findCanchasMasReservadas();
+
+    // 3. Listar canchas por disciplina
+    @Query("SELECT c FROM Cancha c JOIN c.sePractica sp " +
+            "WHERE sp.disciplina.idDisciplina = :idDisciplina")
+    List<Cancha> findCanchasPorDisciplina(@Param("idDisciplina") Long idDisciplina);
+
+    // 4. Listar canchas por zona
+    @Query("SELECT c FROM Cancha c WHERE c.areaDeportiva.zona.idZona = :idZona")
+    List<Cancha> findCanchasPorZona(@Param("idZona") Long idZona);
+
+    // 5. Listar canchas abiertas en este momento
+    @Query("SELECT c FROM Cancha c WHERE c.horaInicio <= :horaActual AND c.horaFin >= :horaActual AND c.estado = true")
+    List<Cancha> findCanchasAbiertas(@Param("horaActual") LocalTime horaActual);
+
+    // 6. Listar canchas disponibles en fecha y rango de hora
+    @Query("SELECT c FROM Cancha c WHERE c.estado = true AND c.idCancha NOT IN (" +
+            "SELECT i.cancha.idCancha FROM Incluye i WHERE i.reserva.fechaReserva = :fecha " +
+            "AND ((i.reserva.horaInicio <= :horaFin AND i.reserva.horaFin >= :horaInicio))" +
+            ")")
+    List<Cancha> findCanchasDisponibles(@Param("fecha") LocalDate fecha,
+                                        @Param("horaInicio") LocalTime horaInicio,
+                                        @Param("horaFin") LocalTime horaFin);
+
+    // 7. Listar canchas que ha reservado un cliente
+    @Query("SELECT DISTINCT c FROM Cancha c JOIN c.incluidos i " +
+            "WHERE i.reserva.cliente.id = :idCliente")
+    List<Cancha> findCanchasReservadasPorCliente(@Param("idCliente") Long idCliente);
+
+    // 8. Buscar canchas por nombre de disciplina
+    @Query("SELECT DISTINCT c FROM Cancha c JOIN c.sePractica sp " +
+            "WHERE LOWER(sp.disciplina.nombre) LIKE LOWER(CONCAT('%', :nombreDisciplina, '%'))")
+    List<Cancha> buscarCanchasPorDisciplinaNombre(@Param("nombreDisciplina") String nombreDisciplina);
+
+    // 9. Listar canchas por capacidad
+    List<Cancha> findByCapacidad(Integer capacidad);
+
+    // 10. Listar canchas por tipo de superficie
+    List<Cancha> findByTipoSuperficieIgnoreCase(String tipoSuperficie);
+
+    // 11. Listar canchas con iluminación específica
+    List<Cancha> findByIluminacionIgnoreCase(String iluminacion);
+
+    // 12. Listar canchas con cubierta específica
+    List<Cancha> findByCubiertaIgnoreCase(String cubierta);
 }

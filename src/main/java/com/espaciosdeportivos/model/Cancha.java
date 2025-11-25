@@ -63,23 +63,11 @@ public class Cancha {
     @Column(name = "estado", nullable = false)
     private Boolean estado;
 
-    /*
-    @CreationTimestamp
-    @Column(name = "fecha_creacion")
-    private LocalDateTime fechaCreacion;
-
-    @UpdateTimestampx
-    @Column(name = "fecha_actualizacion")
-    private LocalDateTime fechaActualizacion;
-     */
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_areadeportiva")
     private AreaDeportiva areaDeportiva;
 
     //revisar por ejmplo si comparten equipamiento enonces no
-
-
     @OneToMany(mappedBy = "cancha", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Dispone> equipamiento;
 

@@ -19,7 +19,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import org.springframework.http.MediaType;
@@ -188,12 +190,112 @@ public class CanchaController {
 
     //@PreAuthorize("hasRole('ROL_ADMIN')")
     //admin k obtener canchas por área deportiva
+
     @GetMapping("/area/{idArea}")
     public ResponseEntity<List<CanchaDTO>> obtenerCanchasPorArea(@PathVariable Long idArea) {
         logger.info("[CANCHA] Inicio obtenerCanchasPorArea: {}", idArea);
         List<CanchaDTO> canchas = canchaService.obtenerCanchasPorArea(idArea);
         logger.info("[CANCHA] Fin obtenerCanchasPorArea: {} canchas encontradas", canchas.size());
         return ResponseEntity.ok(canchas);
+    }
+    //nuevas enspoints
+    @GetMapping("/mejor-calificadas")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasMejorCalificadas() {
+        logger.info("[CANCHA] Inicio obtenerCanchasMejorCalificadas");
+        List<CanchaDTO> lista = canchaService.obtenerCanchasMejorCalificadas();
+        logger.info("[CANCHA] Fin obtenerCanchasMejorCalificadas");
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/mas-reservadas")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasMasReservadas() {
+        logger.info("[CANCHA] Inicio obtenerCanchasMasReservadas");
+        List<CanchaDTO> lista = canchaService.obtenerCanchasMasReservadas();
+        logger.info("[CANCHA] Fin obtenerCanchasMasReservadas");
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/por-disciplina/{idDisciplina}")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasPorDisciplina(@PathVariable Long idDisciplina) {
+        logger.info("[CANCHA] Inicio obtenerCanchasPorDisciplina idDisciplina={}", idDisciplina);
+        List<CanchaDTO> lista = canchaService.obtenerCanchasPorDisciplina(idDisciplina);
+        logger.info("[CANCHA] Fin obtenerCanchasPorDisciplina idDisciplina={}", idDisciplina);
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/por-zona/{idZona}")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasPorZona(@PathVariable Long idZona) {
+        logger.info("[CANCHA] Inicio obtenerCanchasPorZona idZona={}", idZona);
+        List<CanchaDTO> lista = canchaService.obtenerCanchasPorZona(idZona);
+        logger.info("[CANCHA] Fin obtenerCanchasPorZona idZona={}", idZona);
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/abiertas-ahora")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasAbiertasAhora() {
+        logger.info("[CANCHA] Inicio obtenerCanchasAbiertasAhora");
+        List<CanchaDTO> lista = canchaService.obtenerCanchasAbiertas();
+        logger.info("[CANCHA] Fin obtenerCanchasAbiertasAhora");
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/disponibles")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasDisponibles(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime horaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime horaFin) {
+        logger.info("[CANCHA] Inicio obtenerCanchasDisponibles fecha={} horaInicio={} horaFin={}", fecha, horaInicio, horaFin);
+        List<CanchaDTO> lista = canchaService.obtenerCanchasDisponibles(fecha, horaInicio, horaFin);
+        logger.info("[CANCHA] Fin obtenerCanchasDisponibles fecha={} horaInicio={} horaFin={}", fecha, horaInicio, horaFin);
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/reservadas-cliente/{idCliente}")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasReservadasPorCliente(@PathVariable Long idCliente) {
+        logger.info("[CANCHA] Inicio obtenerCanchasReservadasPorCliente idCliente={}", idCliente);
+        List<CanchaDTO> lista = canchaService.obtenerCanchasReservadasPorCliente(idCliente);
+        logger.info("[CANCHA] Fin obtenerCanchasReservadasPorCliente idCliente={}", idCliente);
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/buscar-por-disciplina")
+    public ResponseEntity<List<CanchaDTO>> buscarCanchasPorNombreDisciplina(@RequestParam String nombreDisciplina) {
+        logger.info("[CANCHA] Inicio buscarCanchasPorNombreDisciplina nombreDisciplina={}", nombreDisciplina);
+        List<CanchaDTO> lista = canchaService.buscarCanchasPorNombreDisciplina(nombreDisciplina);
+        logger.info("[CANCHA] Fin buscarCanchasPorNombreDisciplina nombreDisciplina={}", nombreDisciplina);
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/por-capacidad/{capacidad}")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasPorCapacidad(@PathVariable Integer capacidad) {
+        logger.info("[CANCHA] Inicio obtenerCanchasPorCapacidad capacidad={}", capacidad);
+        List<CanchaDTO> lista = canchaService.obtenerCanchasPorCapacidad(capacidad);
+        logger.info("[CANCHA] Fin obtenerCanchasPorCapacidad capacidad={}", capacidad);
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/por-superficie")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasPorTipoSuperficie(@RequestParam String tipoSuperficie) {
+        logger.info("[CANCHA] Inicio obtenerCanchasPorTipoSuperficie tipoSuperficie={}", tipoSuperficie);
+        List<CanchaDTO> lista = canchaService.obtenerCanchasPorTipoSuperficie(tipoSuperficie);
+        logger.info("[CANCHA] Fin obtenerCanchasPorTipoSuperficie tipoSuperficie={}", tipoSuperficie);
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/por-iluminacion")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasPorIluminacion(@RequestParam String iluminacion) {
+        logger.info("[CANCHA] Inicio obtenerCanchasPorIluminacion iluminacion={}", iluminacion);
+        List<CanchaDTO> lista = canchaService.obtenerCanchasPorIluminacion(iluminacion);
+        logger.info("[CANCHA] Fin obtenerCanchasPorIluminacion iluminacion={}", iluminacion);
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/por-cubierta")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasPorCubierta(@RequestParam String cubierta) {
+        logger.info("[CANCHA] Inicio obtenerCanchasPorCubierta cubierta={}", cubierta);
+        List<CanchaDTO> lista = canchaService.obtenerCanchasPorCubierta(cubierta);
+        logger.info("[CANCHA] Fin obtenerCanchasPorCubierta cubierta={}", cubierta);
+        return ResponseEntity.ok(lista);
     }
 
 }
