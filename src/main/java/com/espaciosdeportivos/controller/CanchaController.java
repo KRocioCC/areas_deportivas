@@ -198,6 +198,15 @@ public class CanchaController {
         logger.info("[CANCHA] Fin obtenerCanchasPorArea: {} canchas encontradas", canchas.size());
         return ResponseEntity.ok(canchas);
     }
+
+    @GetMapping("/area/{idArea}/activas")
+    public ResponseEntity<List<CanchaDTO>> obtenerCanchasPorAreaActivas(@PathVariable Long idArea) {
+        logger.info("[CANCHA] Inicio obtenerCanchasPorArea: {}", idArea);
+        List<CanchaDTO> canchas = canchaService.obtenerCanchasPorAreaActivas(idArea);
+        logger.info("[CANCHA] Fin obtenerCanchasPorArea: {} canchas encontradas", canchas.size());
+        return ResponseEntity.ok(canchas);
+    }
+
     //nuevas enspoints
     @GetMapping("/mejor-calificadas")
     public ResponseEntity<List<CanchaDTO>> obtenerCanchasMejorCalificadas() {

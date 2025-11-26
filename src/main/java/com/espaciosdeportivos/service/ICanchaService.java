@@ -66,7 +66,8 @@ public interface ICanchaService {
 
     //ADMIN K - Obtener canchas por área deportiva
     List<CanchaDTO> obtenerCanchasPorArea(Long idArea);
-    
+
+    List<CanchaDTO> obtenerCanchasPorAreaActivas(Long idArea);
     // Gestión de imágenes específica
     CanchaDTO agregarImagenes(Long idCancha, List<MultipartFile> archivosImagenes);
     CanchaDTO eliminarImagen(Long idCancha, Long idImagenRelacion);
