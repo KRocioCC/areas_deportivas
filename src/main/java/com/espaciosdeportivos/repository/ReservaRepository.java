@@ -2,6 +2,7 @@ package com.espaciosdeportivos.repository;
 
 import com.espaciosdeportivos.model.Cancha;
 import com.espaciosdeportivos.model.Cliente;
+import com.espaciosdeportivos.model.Participa;
 import com.espaciosdeportivos.model.Reserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -128,6 +129,26 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
            "WHERE i.cancha.idCancha = :idCancha")
        List<Reserva> findAllByCanchaId(@Param("idCancha") Long idCancha);
 
+       /*S */
+       List<Reserva> findAllByOrderByFechaCreacionAsc();
+       List<Reserva> findAllByOrderByFechaCreacionDesc();
+       
+       //List<Participa> findByReserva_IdReserva(Long idReserva);
+
+
+       @Query("""
+       SELECT r FROM Reserva r
+       JOIN Incluye i ON i.reserva.idReserva = r.idReserva
+       JOIN Cancha c ON c.idCancha = i.cancha.idCancha
+       WHERE LOWER(c.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))
+       """)
+       List<Reserva> findByNombreCancha(@Param("nombre") String nombre);
+
+
+       /*@Query("SELECT p FROM Participa p WHERE p.reserva.idReserva = :idReserva")
+       List<Participa> findByReserva(@Param("idReserva") Long idReserva);*/
+
+       
        // OPCIÓN A: Usando @Query si la relación es vía INCLUYE
        @Query("SELECT r FROM Reserva r " +
                      "JOIN Incluye i ON i.reserva.id = r.id " +

@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.validation.Valid;
 
+import java.time.LocalDate;
 //import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -293,10 +294,116 @@ public class CanchaServiceImpl implements ICanchaService {
                     .collect(Collectors.toList());
     }
 
+    //NUEVAS ENDPOINTS AGREGADAS
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> obtenerCanchasMejorCalificadas() {
+        return canchaRepository.findCanchasMejorCalificadas()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> obtenerCanchasMasReservadas() {
+        return canchaRepository.findCanchasMasReservadas()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> obtenerCanchasPorDisciplina(Long idDisciplina) {
+        return canchaRepository.findCanchasPorDisciplina(idDisciplina)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
-    
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> obtenerCanchasPorZona(Long idZona) {
+        return canchaRepository.findCanchasPorZona(idZona)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> obtenerCanchasAbiertas() {
+        LocalTime horaActual = LocalTime.now();
+        return canchaRepository.findCanchasAbiertas(horaActual)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> obtenerCanchasDisponibles(LocalDate fecha, LocalTime horaInicio, LocalTime horaFin) {
+        return canchaRepository.findCanchasDisponibles(fecha, horaInicio, horaFin)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> obtenerCanchasReservadasPorCliente(Long idCliente) {
+        return canchaRepository.findCanchasReservadasPorCliente(idCliente)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> buscarCanchasPorNombreDisciplina(String nombreDisciplina) {
+        return canchaRepository.buscarCanchasPorDisciplinaNombre(nombreDisciplina)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> obtenerCanchasPorCapacidad(Integer capacidad) {
+        return canchaRepository.findByCapacidad(capacidad)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> obtenerCanchasPorTipoSuperficie(String tipoSuperficie) {
+        return canchaRepository.findByTipoSuperficieIgnoreCase(tipoSuperficie)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> obtenerCanchasPorIluminacion(String iluminacion) {
+        return canchaRepository.findByIluminacionIgnoreCase(iluminacion)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CanchaDTO> obtenerCanchasPorCubierta(String cubierta) {
+        return canchaRepository.findByCubiertaIgnoreCase(cubierta)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    //NUEVAS
 
     // --------- MAPEO ----------
     private CanchaDTO convertToDTO(Cancha c) {

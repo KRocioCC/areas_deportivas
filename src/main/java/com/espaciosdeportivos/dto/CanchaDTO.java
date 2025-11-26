@@ -31,10 +31,7 @@ public class CanchaDTO implements Serializable {
     @NotNull(message = "La capacidad es obligatoria")
     @Positive(message = "La capacidad debe ser un valor positivo")
     private Integer capacidad;
-
-   /* @NotBlank(message = "El estado es obligatorio")
-    private String estado;*/
-
+    
     @NotNull(message = "El estado es obligatorio")
     private Boolean estado;
 
@@ -71,27 +68,16 @@ public class CanchaDTO implements Serializable {
 
     //objetos
     private AreaDeportivaDTO areaDeportiva; // objeto front
-
     private List<EquipamientoDTO> equipamientos;
-    //private List<ReservaDTO> reservas;
+
     private List<DisciplinaDTO> disciplinas;
     private List<ComentarioDTO> comentarios;
-
-    
-    // Para RESPUESTA - imágenes ya procesadas
     private List<ImagenDTO> imagenes;
-    //private LocalDateTime fechaCreacion;
-    //private LocalDateTime fechaActualizacion;
-    
-    // Para CREACIÓN/ACTUALIZACIÓN - ignorado en JSON
     @JsonIgnore
     private transient List<MultipartFile> archivosImagenes;
-    
-    // Métodos de utilidad
     public boolean tieneArchivosParaProcesar() {
         return archivosImagenes != null && !archivosImagenes.isEmpty();
     }
-    //
     public boolean esValidoParaCreacion() {
         return nombre != null && !nombre.trim().isEmpty();
     }

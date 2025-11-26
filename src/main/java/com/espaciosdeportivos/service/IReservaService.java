@@ -66,6 +66,26 @@ public interface IReservaService {
        // Listar reservas por cancha k
     List<ReservaDTO> listarReservasPorCancha(Long idCancha);
 
+    List<Reserva> findByClienteIdAndEstadoReserva(Long clienteId, String estadoReserva);
+
+    // Buscar por cliente y estado
+    List<ReservaDTO> buscarPorClienteYEstado(Long clienteId, String estado);
+
+    // Ordenar por fecha de creación
+    List<ReservaDTO> ordenarPorFechaCreacionAsc();
+    List<ReservaDTO> ordenarPorFechaCreacionDesc();
+
+    // Listar invitados por reserva (devuelve IDs de invitados)
+    List<Long> listarInvitados(Long idReserva);
+
+    // Buscar por nombre de cancha (texto)
+    List<ReservaDTO> buscarPorNombreCancha(String nombre);
+
+    // Buscar por disciplina (si ya lo usas)
+    //List<ReservaDTO> buscarPorDisciplina(String disciplina);
+
+    
+
     // --- NUEVO MÉTODO PARA EL REPORTE DE PAGOS ---
     List<ReservaDTO> buscarTodasPorAdministrador(Long idAdministrador);
 }

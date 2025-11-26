@@ -198,11 +198,12 @@ public class ReservaController {
         }
     }
     //RESERVAS DEL CLIENTE
-    @GetMapping("/cliente/{clienteId}/reserva")
+    @GetMapping("/cliente/{clienteId}/reservas")
     public ResponseEntity<List<ReservaDTO>> buscarTodasPorCliente(@PathVariable Long clienteId) {
         List<ReservaDTO> reservas = reservaService.buscarTodasLasReservasDelCliente(clienteId);
         return ResponseEntity.ok(reservas);
     }
+
 
     /*@GetMapping("/codigo/{codigo}")
     public ResponseEntity<ReservaDTO> obtenerPorCodigo(@PathVariable String codigo) {
@@ -236,15 +237,53 @@ public class ReservaController {
         return ResponseEntity.ok(reservas);
     }/* */
 
-    
-
     // Listar reservas por cancha k
-@GetMapping("/{idCancha}/reservas")
-public ResponseEntity<List<ReservaDTO>> obtenerReservasPorCancha(@PathVariable Long idCancha) {
-    List<ReservaDTO> reservas = reservaService.listarReservasPorCancha(idCancha);
-    return ResponseEntity.ok(reservas);
-}
+    @GetMapping("/{idCancha}/reservas")
+    public ResponseEntity<List<ReservaDTO>> obtenerReservasPorCancha(@PathVariable Long idCancha) {
+        List<ReservaDTO> reservas = reservaService.listarReservasPorCancha(idCancha);
+        return ResponseEntity.ok(reservas);
+    }
 
+    // Eliminado método duplicado `getPorCliente` para evitar mapeos idénticos.
+
+    // Buscar por cliente y estado
+    @GetMapping("/cliente/{idCliente}/estado/{estado}")
+    public ResponseEntity<List<ReservaDTO>> buscarPorClienteYEstado(
+            @PathVariable Long idCliente,
+            @PathVariable String estado
+    ) {
+        return ResponseEntity.ok(reservaService.buscarPorClienteYEstado(idCliente, estado));
+    }
+
+    // Buscar por nombre de cancha
+    @GetMapping("/cancha/{nombre}")
+    public ResponseEntity<List<ReservaDTO>> buscarPorNombreCancha(
+            @PathVariable String nombre
+    ) {
+        return ResponseEntity.ok(reservaService.buscarPorNombreCancha(nombre));
+    }
+
+    @GetMapping("/cliente/{idCliente}/orden/fecha-creacion/asc")
+    public ResponseEntity<List<ReservaDTO>> ordenarPorFechaCreacionAsc(@PathVariable Long idCliente) {
+        // El servicio actualmente devuelve todas las reservas ordenadas por fecha de creación.
+        // Si se requiere filtrar por cliente, implementar en el servicio.
+        List<ReservaDTO> ordenadas = reservaService.ordenarPorFechaCreacionAsc();
+        return ResponseEntity.ok(ordenadas);
+    }
+
+    @GetMapping("/cliente/{idCliente}/orden/fecha-creacion/desc")
+    public ResponseEntity<List<ReservaDTO>> ordenarPorFechaCreacionDesc(@PathVariable Long idCliente) {
+        List<ReservaDTO> ordenadas = reservaService.ordenarPorFechaCreacionDesc();
+        return ResponseEntity.ok(ordenadas);
+    }
+
+        // Listar invitados por reserva (solo IDs)
+    @GetMapping("/{idReserva}/invitados")
+    public ResponseEntity<List<Long>> listarInvitados(
+            @PathVariable Long idReserva
+    ) {
+        return ResponseEntity.ok(reservaService.listarInvitados(idReserva));
+    }
 // --- NUEVO ENDPOINT PARA REPORTE DE PAGOS (ESTO ES LO QUE FALTABA) ---
 @GetMapping("/admin/{idAdmin}")
 public ResponseEntity<List<ReservaDTO>> getReservasByAdmin(@PathVariable Long idAdmin) {

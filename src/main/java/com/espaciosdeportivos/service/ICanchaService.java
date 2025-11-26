@@ -1,5 +1,6 @@
 package com.espaciosdeportivos.service;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -70,6 +71,47 @@ public interface ICanchaService {
     CanchaDTO agregarImagenes(Long idCancha, List<MultipartFile> archivosImagenes);
     CanchaDTO eliminarImagen(Long idCancha, Long idImagenRelacion);
     CanchaDTO reordenarImagenes(Long idCancha, List<Long> idsImagenesOrden);
+    //nuevas enpoints
+
+    // 1. Mostrar canchas con el promedio de mejores calificaciones
+    List<CanchaDTO> obtenerCanchasMejorCalificadas();
+
+    // 2. Mostrar canchas con mayor número de reservas
+    List<CanchaDTO> obtenerCanchasMasReservadas();
+
+    // 3. Listar canchas por disciplinas
+    List<CanchaDTO> obtenerCanchasPorDisciplina(Long idDisciplina);
+
+    // 4. Listar canchas por zona
+    List<CanchaDTO> obtenerCanchasPorZona(Long idZona);
+
+    // 5. Listar canchas abiertas en estos momentos
+    List<CanchaDTO> obtenerCanchasAbiertas();
+
+    // 6. Listar canchas por horarios disponibles
+    List<CanchaDTO> obtenerCanchasDisponibles(LocalDate fecha, LocalTime horaInicio, LocalTime horaFin);
+
+    // 7. Listar canchas que ha reservado un cliente
+    List<CanchaDTO> obtenerCanchasReservadasPorCliente(Long idCliente);
+
+    // 8. Buscar canchas por una disciplina (por nombre)
+    List<CanchaDTO> buscarCanchasPorNombreDisciplina(String nombreDisciplina);
+    // 9. Listar canchas con capacidad x
+    List<CanchaDTO> obtenerCanchasPorCapacidad(Integer capacidad);
+
+    // 10. Listar canchas por tipo de superficie
+    List<CanchaDTO> obtenerCanchasPorTipoSuperficie(String tipoSuperficie);
+
+    // 11. Listar canchas con iluminación
+    List<CanchaDTO> obtenerCanchasPorIluminacion(String tipoIluminacion);
+
+    // 12. Listar canchas con cubierta
+    List<CanchaDTO> obtenerCanchasPorCubierta(String tipoCubierta);
+
+    // Para después: cancelar y reprogramar
+    // void cancelarReserva(Long idReserva);
+    // void reprogramarReserva(Long idReserva, LocalDate nuevaFecha, LocalTime nuevaHoraInicio, LocalTime nuevaHoraFin);
+
 
     
 }

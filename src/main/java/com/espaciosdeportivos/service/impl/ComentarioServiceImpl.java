@@ -136,6 +136,65 @@ public class ComentarioServiceImpl implements IComentarioService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+     // ---------- COMENTARIOS POR CANCHA ----------
+    /*@Override
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosPorCancha(Long canchaId) {
+        return comentarioRepository.findByCancha_IdCanchaOrderByFechaDesc(canchaId).stream()
+                .map(this::convertToDTO)
+                .toList();
+    }*/
+
+    // ---------- COMENTARIOS MÁS RECIENTES ----------
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosMasRecientes(int limite) {  // ✅ AGREGAR parámetro
+        return comentarioRepository.findAllByOrderByFechaDesc().stream()
+                .limit(limite)  // ✅ AGREGAR límite
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+    // ---------- COMENTARIOS CON MAYOR PUNTUACIÓN ----------
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosMayorCalificacion(int limite) {  // ✅ AGREGAR parámetro
+        return comentarioRepository.findByOrderByCalificacionDesc().stream()
+                .limit(limite)  // ✅ AGREGAR límite
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+    // ---------- COMENTARIOS CON MAYOR PUNTUACIÓN Y RECIENTES ----------
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosMayorCalificacionMasRecientes(int limite) {  // ✅ AGREGAR parámetro
+        return comentarioRepository.findMayorCalificacionMasRecientes().stream()
+                .limit(limite)  // ✅ AGREGAR límite
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+    // ---------- COMENTARIOS POR CALIFICACIÓN ESPECÍFICA ----------
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosPorCalificacion(int calificacion) {
+        return comentarioRepository.findByCalificacion(calificacion).stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+    // ---------- COMENTARIOS POR CLIENTE ----------
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosPorCliente(Long clienteId) {
+        return comentarioRepository.findByPersona_Id(clienteId).stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+    // ---------- COMENTARIOS POR ÁREA DEPORTIVA ----------
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosPorAreaDeportiva(Long areaId) {
+        return comentarioRepository.findByAreaDeportiva(areaId).stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
 
     // ---------- mapping ----------
     private ComentarioDTO convertToDTO(Comentario c) {
