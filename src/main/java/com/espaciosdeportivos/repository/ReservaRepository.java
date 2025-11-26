@@ -130,20 +130,39 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
        List<Reserva> findAllByCanchaId(@Param("idCancha") Long idCancha);
 
        /*S */
-       List<Reserva> findAllByOrderByFechaCreacionAsc();
-       List<Reserva> findAllByOrderByFechaCreacionDesc();
+       // ✔ Ordenar reservas del cliente por fecha de creación ASC
+       List<Reserva> findByClienteIdOrderByFechaCreacionAsc(Long clienteId);
+       // ✔ Ordenar reservas del cliente por fecha de creación DESC
+       List<Reserva> findByClienteIdOrderByFechaCreacionDesc(Long clienteId);
        
        //List<Participa> findByReserva_IdReserva(Long idReserva);
 
 
+       // ✔ Buscar reservas del cliente por nombre de cancha
        @Query("""
-       SELECT r FROM Reserva r
-       JOIN Incluye i ON i.reserva.idReserva = r.idReserva
-       JOIN Cancha c ON c.idCancha = i.cancha.idCancha
-       WHERE LOWER(c.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))
-       """)
-       List<Reserva> findByNombreCancha(@Param("nombre") String nombre);
+              SELECT r FROM Reserva r
+              JOIN Incluye i ON i.reserva.idReserva = r.idReserva
+              JOIN Cancha c ON c.idCancha = i.cancha.idCancha
+              WHERE r.cliente.id = :clienteId
+              AND LOWER(c.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))
+              """)
+       List<Reserva> findByClienteIdAndNombreCancha(
+              @Param("clienteId") Long clienteId,
+              @Param("nombre") String nombre
+       );
 
+
+       // ✔ Buscar reservas del cliente en un rango de fechas
+       @Query("""
+              SELECT r FROM Reserva r
+              WHERE r.cliente.id = :clienteId
+              AND r.fechaReserva BETWEEN :inicio AND :fin
+              """)
+       List<Reserva> buscarPorClienteEnRango(
+              @Param("clienteId") Long clienteId,
+              @Param("inicio") LocalDate inicio,
+              @Param("fin") LocalDate fin
+       );
 
        /*@Query("SELECT p FROM Participa p WHERE p.reserva.idReserva = :idReserva")
        List<Participa> findByReserva(@Param("idReserva") Long idReserva);*/

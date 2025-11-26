@@ -255,27 +255,22 @@ public class ReservaController {
         return ResponseEntity.ok(reservaService.buscarPorClienteYEstado(idCliente, estado));
     }
 
-    // Buscar por nombre de cancha
-    @GetMapping("/cancha/{nombre}")
-    public ResponseEntity<List<ReservaDTO>> buscarPorNombreCancha(
-            @PathVariable String nombre
-    ) {
-        return ResponseEntity.ok(reservaService.buscarPorNombreCancha(nombre));
+
+
+
+        // 4. Ordenar reservas por fecha de creación ASC
+    @GetMapping("/cliente/{idCliente}/orden/asc")
+    public ResponseEntity<List<ReservaDTO>> ordenarAsc(@PathVariable Long idCliente) {
+        return ResponseEntity.ok(reservaService.ordenarPorFechaCreacionAsc(idCliente));
     }
 
-    @GetMapping("/cliente/{idCliente}/orden/fecha-creacion/asc")
-    public ResponseEntity<List<ReservaDTO>> ordenarPorFechaCreacionAsc(@PathVariable Long idCliente) {
-        // El servicio actualmente devuelve todas las reservas ordenadas por fecha de creación.
-        // Si se requiere filtrar por cliente, implementar en el servicio.
-        List<ReservaDTO> ordenadas = reservaService.ordenarPorFechaCreacionAsc();
-        return ResponseEntity.ok(ordenadas);
+
+    // 5. Ordenar reservas por fecha de creación DESC
+    @GetMapping("/cliente/{idCliente}/orden/desc")
+    public ResponseEntity<List<ReservaDTO>> ordenarDesc(@PathVariable Long idCliente) {
+        return ResponseEntity.ok(reservaService.ordenarPorFechaCreacionDesc(idCliente));
     }
 
-    @GetMapping("/cliente/{idCliente}/orden/fecha-creacion/desc")
-    public ResponseEntity<List<ReservaDTO>> ordenarPorFechaCreacionDesc(@PathVariable Long idCliente) {
-        List<ReservaDTO> ordenadas = reservaService.ordenarPorFechaCreacionDesc();
-        return ResponseEntity.ok(ordenadas);
-    }
 
         // Listar invitados por reserva (solo IDs)
     @GetMapping("/{idReserva}/invitados")

@@ -376,19 +376,23 @@ public class ReservaServiceImpl implements IReservaService {
     }
 
     // Ordenar por fecha de creación (asc / desc)
+    // Ordenar por fecha creación ASC solo del cliente
     @Override
     @Transactional(readOnly = true)
-    public List<ReservaDTO> ordenarPorFechaCreacionAsc() {
-        return reservaRepository.findAllByOrderByFechaCreacionAsc()
+    public List<ReservaDTO> ordenarPorFechaCreacionAsc(Long clienteId) {
+        return reservaRepository.findByClienteIdOrderByFechaCreacionAsc(clienteId)
                 .stream().map(this::convertToDTO).toList();
     }
 
+
+    // Ordenar por fecha creación DESC solo del cliente
     @Override
     @Transactional(readOnly = true)
-    public List<ReservaDTO> ordenarPorFechaCreacionDesc() {
-        return reservaRepository.findAllByOrderByFechaCreacionDesc()
+    public List<ReservaDTO> ordenarPorFechaCreacionDesc(Long clienteId) {
+        return reservaRepository.findByClienteIdOrderByFechaCreacionDesc(clienteId)
                 .stream().map(this::convertToDTO).toList();
     }
+
 
     // Listar invitados (devuelve lista de IDs)
     @Override
@@ -403,12 +407,23 @@ public class ReservaServiceImpl implements IReservaService {
     }
 
     // Buscar por nombre de cancha usando el query que añadiste al repo
+        // Buscar reservas por nombre de cancha del cliente
     @Override
     @Transactional(readOnly = true)
-    public List<ReservaDTO> buscarPorNombreCancha(String nombre) {
-        return reservaRepository.findByNombreCancha(nombre)
+    public List<ReservaDTO> buscarPorNombreCancha(Long clienteId, String nombre) {
+        return reservaRepository.findByClienteIdAndNombreCancha(clienteId, nombre)
                 .stream().map(this::convertToDTO).toList();
     }
+
+
+    // Reservas del cliente por rango de fechas
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> buscarPorClienteEnRango(Long clienteId, LocalDate inicio, LocalDate fin) {
+        return reservaRepository.buscarPorClienteEnRango(clienteId, inicio, fin)
+                .stream().map(this::convertToDTO).toList();
+    }
+
 
     @Override
     @Transactional(readOnly = true)

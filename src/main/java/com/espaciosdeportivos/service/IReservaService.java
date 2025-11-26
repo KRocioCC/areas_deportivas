@@ -72,17 +72,26 @@ public interface IReservaService {
     List<ReservaDTO> buscarPorClienteYEstado(Long clienteId, String estado);
 
     // Ordenar por fecha de creación
-    List<ReservaDTO> ordenarPorFechaCreacionAsc();
-    List<ReservaDTO> ordenarPorFechaCreacionDesc();
+    // ✔ Ordenar reservas del cliente por fecha de creación ASC
+    List<ReservaDTO> ordenarPorFechaCreacionAsc(Long clienteId);
+
+
+    // ✔ Ordenar reservas del cliente por fecha de creación DESC
+    List<ReservaDTO> ordenarPorFechaCreacionDesc(Long clienteId);
+
 
     // Listar invitados por reserva (devuelve IDs de invitados)
     List<Long> listarInvitados(Long idReserva);
 
+    
     // Buscar por nombre de cancha (texto)
-    List<ReservaDTO> buscarPorNombreCancha(String nombre);
+    List<ReservaDTO> buscarPorNombreCancha(Long clienteId, String nombre);
+    List<ReservaDTO> buscarPorClienteEnRango(Long clienteId, LocalDate inicio, LocalDate fin);
+
 
     // Buscar por disciplina (si ya lo usas)
     //List<ReservaDTO> buscarPorDisciplina(String disciplina);
+
 
     
 
