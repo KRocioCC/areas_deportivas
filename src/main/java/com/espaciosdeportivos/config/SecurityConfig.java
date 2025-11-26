@@ -37,7 +37,6 @@ public class SecurityConfig {
 
     @Autowired
     private JwtUtils jwtUtils;
-    
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -59,82 +58,95 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                // =============================================
-                // 🔓 RUTAS PÚBLICAS (Sin autenticación)
-                // =============================================
-                
-                // Autenticación
-                .requestMatchers("/api/auth/**").permitAll()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // =============================================
+                        // 🔓 RUTAS PÚBLICAS (Sin autenticación)
+                        // =============================================
 
-                // Archivos e imágenes
-                .requestMatchers("/api/imagenes/archivo/**").permitAll()
-                .requestMatchers("/api/archivos/**").permitAll()
-                .requestMatchers("/img/**").permitAll()
+                        // Autenticación
+                        .requestMatchers("/api/auth/**").permitAll()
 
-                // Lectura pública de canchas, áreas, disciplinas (solo GETs)
-                .requestMatchers(HttpMethod.GET, "/api/areasdeportivas/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/cancha/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/disciplina/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/cancha/equipamientos/**").permitAll()
+                        // Archivos e imágenes
+                        .requestMatchers("/api/imagenes/archivo/**").permitAll()
+                        .requestMatchers("/api/archivos/**").permitAll()
+                        .requestMatchers("/img/**").permitAll()
 
-                //.requestMatchers("/api/areasdeportivas/**").permitAll()//validar mejor es que yo necesito las ctivas y listar areas deportivas por id eso necsito
-                //.requestMatchers("/api/cancha/area/**").permitAll()
-                //.requestMatchers("/api/cancha/porid/**").permitAll() //ojito cambie ladirecion de id
-                //.requestMatchers("/api/cancha/equipamientos/**").permitAll()
-                //.requestMatchers("/api/cancha/disciplinas/**").permitAll()
-                //.requestMatchers("/api/cancha/disciplinas/**").permitAll()
-                //.requestMatchers("/api/disciplina/porid/**").permitAll()
-                //.requestMatchers("/api/disciplina/activos").permitAll()
+                        // Lectura pública de canchas, áreas, disciplinas (solo GETs)
+                        .requestMatchers(HttpMethod.GET, "/api/areasdeportivas/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/cancha/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/disciplina/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/cancha/equipamientos/**").permitAll()
 
-                
+                        // .requestMatchers("/api/areasdeportivas/**").permitAll()//validar mejor es que
+                        // yo necesito las ctivas y listar areas deportivas por id eso necsito
+                        // .requestMatchers("/api/cancha/area/**").permitAll()
+                        // .requestMatchers("/api/cancha/porid/**").permitAll() //ojito cambie
+                        // ladirecion de id
+                        // .requestMatchers("/api/cancha/equipamientos/**").permitAll()
+                        // .requestMatchers("/api/cancha/disciplinas/**").permitAll()
+                        // .requestMatchers("/api/cancha/disciplinas/**").permitAll()
+                        // .requestMatchers("/api/disciplina/porid/**").permitAll()
+                        // .requestMatchers("/api/disciplina/activos").permitAll()
 
-                // Swagger / OpenAPI
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // Swagger / OpenAPI
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                /* ==================== SUPERUSUARIO (acceso total a rutas /super) ==================== */
-                .requestMatchers("/api/super/**").hasRole("SUPERUSUARIO")
-                //rutas restringidas por rol
-                // Rutas exclusivas para SUPERUSUARIO
-                .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
-                .requestMatchers("/api/qr/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
-                .requestMatchers("/api/pagos/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
+                        /*
+                         * ==================== SUPERUSUARIO (acceso total a rutas /super)
+                         * ====================
+                         */
+                        .requestMatchers("/api/super/**").hasRole("SUPERUSUARIO")
+                        // rutas restringidas por rol
+                        // Rutas exclusivas para SUPERUSUARIO
+                        .requestMatchers("/api/areasdeportivas/**")
+                        .hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
+                        .requestMatchers("/api/qr/**")
+                        .hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
+                        .requestMatchers("/api/pagos/**")
+                        .hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
 
-                //agregando al usuario de control para verificar funcionamiento
-                //.requestMatchers("/api/**").hasRole("SUPERUSUARIO")
-                //.requestMatchers("/api/cancha/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")   
-                //.requestMatchers("/api/admin/**").hasRole("SUPERUSUARIO") ESTO DEJENLO COMENTADO!
-                //.requestMatchers("/api/areasdeportivas/**").hasRole("SUPERUSUARIO")
+                        // agregando al usuario de control para verificar funcionamiento
+                        // .requestMatchers("/api/**").hasRole("SUPERUSUARIO")
+                        .requestMatchers("/api/cancha/**").hasAnyRole("ADMINISTRADOR", "USUARIO_CONTROL", "CLIENTE")
+                        // Permisos para comentarios
+                        .requestMatchers("/api/comentario/**")
+                        .hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
+                        // .requestMatchers("/api/admin/**").hasRole("SUPERUSUARIO") ESTO DEJENLO
+                        // COMENTADO!
+                        // .requestMatchers("/api/areasdeportivas/**").hasRole("SUPERUSUARIO")
 
+                        /* ==================== ADMINISTRADOR y SUPERUSUARIO ==================== */
+                        .requestMatchers("/api/admin/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
+                        .requestMatchers("/api/administradores/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/cancha/*/imagenes")
+                        .hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO")
+                        // AHORA (Agrega USUARIO_CONTROL):
+                        .requestMatchers("/api/usuario_control/**")
+                        .hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO", "USUARIO_CONTROL")
+                        .requestMatchers(HttpMethod.PUT, "/api/reservas/*/eliminar").hasRole("ADMINISTRADOR")
 
-                /* ==================== ADMINISTRADOR y SUPERUSUARIO ==================== */
-                .requestMatchers("/api/admin/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
-                .requestMatchers("/api/administradores/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")
-                .requestMatchers(HttpMethod.POST, "/api/cancha/*/imagenes").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO")
-                .requestMatchers("/api/usuario_control/**").hasAnyRole("ADMINISTRADOR", "SUPERUSUARIO")
-                .requestMatchers(HttpMethod.PUT, "/api/reservas/*/eliminar").hasRole("ADMINISTRADOR")
-                
-                // ADMINISTRADOR exclusivo
-                .requestMatchers("/api/supervisa/**").hasRole("ADMINISTRADOR")
-                
-                // =============================================
-                //  RUTAS MIXTAS (Múltiples roles)
-                // =============================================
-                
-                .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
-                .requestMatchers("/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
-                //.requestMatchers("//api/disciplina/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
-                .requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                        // ADMINISTRADOR exclusivo
+                        .requestMatchers("/api/supervisa/**").hasAnyRole("ADMINISTRADOR", "USUARIO_CONTROL")
 
-                // =============================================
-                // RUTA POR DEFECTO
-                // =============================================
-                .anyRequest().authenticated()
-            );
+                        // =============================================
+                        // RUTAS MIXTAS (Múltiples roles)
+                        // =============================================
+
+                        .requestMatchers("/api/areasdeportivas/**")
+                        .hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                        .requestMatchers("/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                        // .requestMatchers("//api/disciplina/**").hasAnyRole("SUPERUSUARIO",
+                        // "ADMINISTRADOR", "CLIENTE")
+                        .requestMatchers("/api/incluye/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+
+                        // =============================================
+                        // RUTA POR DEFECTO
+                        // =============================================
+                        .anyRequest().authenticated());
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -146,14 +158,13 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*", "http://127.0.0.1:*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList(
-            "Authorization",
-            "Content-Type",
-            "Accept",
-            "Origin",
-            "X-Requested-With",
-            "Access-Control-Request-Method",
-            "Access-Control-Request-Headers"
-        ));
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
