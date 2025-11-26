@@ -86,4 +86,6 @@ public interface IReservaService {
 
     
 
+    // --- NUEVO MÉTODO PARA EL REPORTE DE PAGOS ---
+    List<ReservaDTO> buscarTodasPorAdministrador(Long idAdministrador);
 }

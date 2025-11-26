@@ -73,8 +73,10 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     //List<Reserva> findReservaByCancha(Long idCancha);
 
-    @Query("SELECT r FROM Reserva r WHERE r.fechaReserva = :fecha AND r.idReserva IN " +
-       "(SELECT i.reserva.idReserva FROM Incluye i WHERE i.cancha.idCancha = :idCancha)")
+    @Query("SELECT r FROM Reserva r WHERE r.fechaReserva = :fecha " +
+           "AND r.estadoReserva NOT IN ('CANCELADA', 'NO_SHOW') " +
+           "AND r.idReserva IN " +
+           "(SELECT i.reserva.idReserva FROM Incluye i WHERE i.cancha.idCancha = :idCancha)")
     List<Reserva> findByCanchaAndFecha(@Param("idCancha") Long idCancha, @Param("fecha") LocalDate fecha);
 
       /* @Query("""
@@ -147,5 +149,10 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
        List<Participa> findByReserva(@Param("idReserva") Long idReserva);*/
 
        
+       // OPCIÓN A: Usando @Query si la relación es vía INCLUYE
+       @Query("SELECT r FROM Reserva r " +
+                     "JOIN Incluye i ON i.reserva.id = r.id " +
+                     "WHERE i.cancha.areaDeportiva.administrador.id = :idAdmin")
+       List<Reserva> findByCancha_AreaDeportiva_Administrador_Id(@Param("idAdmin") Long idAdmin);
 
 }
