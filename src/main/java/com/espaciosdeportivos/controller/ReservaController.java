@@ -255,6 +255,21 @@ public class ReservaController {
         return ResponseEntity.ok(reservaService.buscarPorClienteYEstado(idCliente, estado));
     }
 
+    @GetMapping("/cliente/{clienteId}/cancha")
+    public List<ReservaDTO> buscarPorNombreCancha(
+            @PathVariable Long clienteId,
+            @RequestParam String nombre) {
+        return reservaService.buscarPorNombreCancha(clienteId, nombre);
+    }
+
+    // Buscar reservas por rango de fechas y cliente
+    @GetMapping("/cliente/{clienteId}/rango-fechas")
+    public List<ReservaDTO> buscarPorClienteEnRango(
+            @PathVariable Long clienteId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin) {
+        return reservaService.buscarPorClienteEnRango(clienteId, inicio, fin);
+    }
 
 
 

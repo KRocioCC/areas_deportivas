@@ -196,6 +196,8 @@ public class ComentarioServiceImpl implements IComentarioService {
                 .toList();
     }
 
+    
+
     // ---------- mapping ----------
     private ComentarioDTO convertToDTO(Comentario c) {
         Persona p = c.getPersona();

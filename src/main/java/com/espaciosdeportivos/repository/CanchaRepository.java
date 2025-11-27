@@ -24,6 +24,9 @@ public interface CanchaRepository extends JpaRepository<Cancha, Long> {
     Optional<Cancha> findByIdCanchaAndEstadoTrue(Long idCancha);
 
     // Por área deportiva (solo activas)
+    // Solo canchas activas por área deportiva
+        List<Cancha> findByAreaDeportiva_IdAreaDeportivaAndEstadoTrue(Long idArea);
+
     //List<Cancha> findByAreaDeportiva_IdAreaDeportivaAndEstadoboolTrue(Long idAreaDeportiva);
 
     @Query("SELECT a FROM Cancha a WHERE LOWER(a.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))")
