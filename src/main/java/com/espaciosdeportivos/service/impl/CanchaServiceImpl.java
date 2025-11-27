@@ -309,6 +309,7 @@ public class CanchaServiceImpl implements ICanchaService {
     public List<CanchaDTO> obtenerCanchasMejorCalificadas() {
         return canchaRepository.findCanchasMejorCalificadas()
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -318,6 +319,7 @@ public class CanchaServiceImpl implements ICanchaService {
     public List<CanchaDTO> obtenerCanchasMasReservadas() {
         return canchaRepository.findCanchasMasReservadas()
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -327,6 +329,7 @@ public class CanchaServiceImpl implements ICanchaService {
     public List<CanchaDTO> obtenerCanchasPorDisciplina(Long idDisciplina) {
         return canchaRepository.findCanchasPorDisciplina(idDisciplina)
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -336,6 +339,7 @@ public class CanchaServiceImpl implements ICanchaService {
     public List<CanchaDTO> obtenerCanchasPorZona(Long idZona) {
         return canchaRepository.findCanchasPorZona(idZona)
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -346,6 +350,7 @@ public class CanchaServiceImpl implements ICanchaService {
         LocalTime horaActual = LocalTime.now();
         return canchaRepository.findCanchasAbiertas(horaActual)
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -355,6 +360,7 @@ public class CanchaServiceImpl implements ICanchaService {
     public List<CanchaDTO> obtenerCanchasDisponibles(LocalDate fecha, LocalTime horaInicio, LocalTime horaFin) {
         return canchaRepository.findCanchasDisponibles(fecha, horaInicio, horaFin)
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -364,6 +370,7 @@ public class CanchaServiceImpl implements ICanchaService {
     public List<CanchaDTO> obtenerCanchasReservadasPorCliente(Long idCliente) {
         return canchaRepository.findCanchasReservadasPorCliente(idCliente)
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -373,6 +380,7 @@ public class CanchaServiceImpl implements ICanchaService {
     public List<CanchaDTO> buscarCanchasPorNombreDisciplina(String nombreDisciplina) {
         return canchaRepository.buscarCanchasPorDisciplinaNombre(nombreDisciplina)
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -382,6 +390,7 @@ public class CanchaServiceImpl implements ICanchaService {
     public List<CanchaDTO> obtenerCanchasPorCapacidad(Integer capacidad) {
         return canchaRepository.findByCapacidad(capacidad)
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -391,6 +400,7 @@ public class CanchaServiceImpl implements ICanchaService {
     public List<CanchaDTO> obtenerCanchasPorTipoSuperficie(String tipoSuperficie) {
         return canchaRepository.findByTipoSuperficieIgnoreCase(tipoSuperficie)
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -400,6 +410,7 @@ public class CanchaServiceImpl implements ICanchaService {
     public List<CanchaDTO> obtenerCanchasPorIluminacion(String iluminacion) {
         return canchaRepository.findByIluminacionIgnoreCase(iluminacion)
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -409,6 +420,7 @@ public class CanchaServiceImpl implements ICanchaService {
     public List<CanchaDTO> obtenerCanchasPorCubierta(String cubierta) {
         return canchaRepository.findByCubiertaIgnoreCase(cubierta)
                 .stream()
+                .filter(c -> c.getEstado())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
