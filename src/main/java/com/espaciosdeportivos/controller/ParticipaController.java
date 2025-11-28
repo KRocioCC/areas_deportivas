@@ -13,7 +13,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/participaciones")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class ParticipaController {
 
     private final IparticipaService participaService;

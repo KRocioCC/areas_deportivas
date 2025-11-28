@@ -83,7 +83,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/cancha/equipamientos/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/comentario/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/comentario/cancha/**").permitAll()
-
+                .requestMatchers("/api/participaciones/**").permitAll()
                 //.requestMatchers("/api/areasdeportivas/**").permitAll()//validar mejor es que yo necesito las ctivas y listar areas deportivas por id eso necsito
                 //.requestMatchers("/api/cancha/area/**").permitAll()
                 //.requestMatchers("/api/cancha/porid/**").permitAll() //ojito cambie ladirecion de id
@@ -105,7 +105,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
                 .requestMatchers("/api/qr/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
                 .requestMatchers("/api/pagos/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
-
+                .requestMatchers("/api/invitados/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
+                //.requestMatchers("/api/participaciones/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
                 //agregando al usuario de control para verificar funcionamiento
                 //.requestMatchers("/api/**").hasRole("SUPERUSUARIO")
                 //.requestMatchers("/api/cancha/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR")   
