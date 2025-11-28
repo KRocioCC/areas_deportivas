@@ -42,4 +42,11 @@ public interface IComentarioService {
     // Listar comentarios por área deportiva
     List<ComentarioDTO> getComentariosPorAreaDeportiva(Long areaDeportivaId);
 
+     // NUEVOS ENDPOINTS FILTRADOS POR CANCHA
+    List<ComentarioDTO> getComentariosMasRecientesCancha(Long canchaId, int limite);
+    List<ComentarioDTO> getComentariosMayorCalificacionCancha(Long canchaId, int limite);
+    List<ComentarioDTO> getComentariosMayorCalificacionMasRecientesCancha(Long canchaId, int limite);
+    List<ComentarioDTO> getComentariosPorCalificacionCancha(Long canchaId, int calificacion);
+    List<ComentarioDTO> getComentariosPorClienteCancha(Long canchaId, Long clienteId);
+
 }

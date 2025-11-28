@@ -158,4 +158,70 @@ public class ComentarioController {
         List<ComentarioDTO> lista = comentarioService.getComentariosPorAreaDeportiva(areaId);
         return ResponseEntity.ok(lista);
     }
+
+    // ---------- OBTENER COMENTARIOS POR CLIENTE ----------
+    @GetMapping("/cliente/{clienteId}/cancha")
+    public ResponseEntity<List<ComentarioDTO>> comentariosPorClienteCancha(
+            @PathVariable Long clienteId,
+            @RequestParam Long canchaId) {
+
+        logger.info("Obteniendo comentarios del cliente {} en la cancha {}", clienteId, canchaId);
+        
+        List<ComentarioDTO> lista = comentarioService.getComentariosPorClienteCancha(canchaId, clienteId);
+        return ResponseEntity.ok(lista);
+    }
+
+
+    // ---------- OBTENER COMENTARIOS MÁS RECIENTES ----------
+    @GetMapping("/recientes/cancha")
+    public ResponseEntity<List<ComentarioDTO>> comentariosMasRecientes(
+            @RequestParam Long canchaId,
+            @RequestParam(defaultValue = "10") int limite) {
+
+        logger.info("Obteniendo {} comentarios más recientes de cancha {}", limite, canchaId);
+
+        List<ComentarioDTO> lista = comentarioService.getComentariosMasRecientesCancha(canchaId, limite);
+        return ResponseEntity.ok(lista);
+    }
+
+
+    // ---------- OBTENER COMENTARIOS CON MAYOR CALIFICACIÓN ----------
+    @GetMapping("/mayor-calificacion/cancha")
+    public ResponseEntity<List<ComentarioDTO>> comentariosMayorCalificacion(
+            @RequestParam Long canchaId,
+            @RequestParam(defaultValue = "10") int limite) {
+
+        logger.info("Obteniendo {} comentarios con mayor calificación de cancha {}", limite, canchaId);
+
+        List<ComentarioDTO> lista = comentarioService.getComentariosMayorCalificacionCancha(canchaId, limite);
+        return ResponseEntity.ok(lista);
+    }
+
+
+    // ---------- OBTENER COMENTARIOS CON MAYOR CALIFICACIÓN Y RECIENTES ----------
+    @GetMapping("/mayor-calificacion-recientes/cancha")
+    public ResponseEntity<List<ComentarioDTO>> comentariosMayorCalificacionRecientes(
+            @RequestParam Long canchaId,
+            @RequestParam(defaultValue = "10") int limite) {
+
+        logger.info("Obteniendo {} comentarios recientes + mayor calificación de cancha {}", limite, canchaId);
+
+        List<ComentarioDTO> lista = comentarioService.getComentariosMayorCalificacionMasRecientesCancha(canchaId, limite);
+        return ResponseEntity.ok(lista);
+    }
+
+
+    // ---------- OBTENER COMENTARIOS POR CALIFICACIÓN ESPECÍFICA ----------
+    @GetMapping("/calificacion/{calificacion}/cancha")
+    public ResponseEntity<List<ComentarioDTO>> comentariosPorCalificacion(
+            @PathVariable Integer calificacion,
+            @RequestParam Long canchaId) {
+
+        logger.info("Obteniendo comentarios con calificación {} en cancha {}", calificacion, canchaId);
+
+        List<ComentarioDTO> lista = comentarioService.getComentariosPorCalificacionCancha(canchaId, calificacion);
+        return ResponseEntity.ok(lista);
+    }
+
+
 }

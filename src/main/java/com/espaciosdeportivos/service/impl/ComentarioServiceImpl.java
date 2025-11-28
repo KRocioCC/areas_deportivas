@@ -196,7 +196,47 @@ public class ComentarioServiceImpl implements IComentarioService {
                 .toList();
     }
 
+
     
+    // ---------- COMENTARIOS MÁS RECIENTES ----------
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosMasRecientesCancha(Long canchaId, int limite) {
+        return comentarioRepository.findByCancha_IdCanchaOrderByCalificacionDesc(canchaId)
+                .stream().limit(limite)
+                .map(this::convertToDTO).toList();
+    }
+
+    // ---------- COMENTARIOS CON MAYOR PUNTUACIÓN ----------
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosMayorCalificacionCancha(Long canchaId, int limite) {
+        return comentarioRepository.findByCancha_IdCanchaOrderByCalificacionDesc(canchaId)
+                .stream().limit(limite)
+                .map(this::convertToDTO).toList();
+    }
+
+    // ---------- COMENTARIOS CON MAYOR PUNTUACIÓN Y RECIENTES ----------
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosMayorCalificacionMasRecientesCancha(Long canchaId, int limite) {
+        return comentarioRepository.findByCancha_IdCanchaOrderByCalificacionDescFechaDesc(canchaId)
+                .stream().limit(limite)
+                .map(this::convertToDTO).toList();
+    }
+
+    // ---------- COMENTARIOS POR CALIFICACIÓN ----------
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosPorCalificacionCancha(Long canchaId, int calificacion) {
+        return comentarioRepository.findByCancha_IdCanchaAndCalificacion(canchaId, calificacion)
+                .stream().map(this::convertToDTO).toList();
+    }
+
+    // ---------- COMENTARIOS POR CLIENTE ----------
+    @Transactional(readOnly = true)
+    public List<ComentarioDTO> getComentariosPorClienteCancha(Long canchaId, Long clienteId) {
+        return comentarioRepository.findByCancha_IdCanchaAndPersona_Id(canchaId, clienteId)
+                .stream().map(this::convertToDTO).toList();
+    }
+
+
 
     // ---------- mapping ----------
     private ComentarioDTO convertToDTO(Comentario c) {

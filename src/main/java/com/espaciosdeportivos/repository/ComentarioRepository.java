@@ -46,6 +46,19 @@ public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
 
     List<Comentario> findByCalificacion(Integer calificacion);
 
+///ssa
+
+// Obtener comentarios por cancha ordenados por calificación descendente
+List<Comentario> findByCancha_IdCanchaOrderByCalificacionDesc(Long idCancha);
+
+// Obtener comentarios por cancha ordenados por calificación DESC y fecha DESC
+List<Comentario> findByCancha_IdCanchaOrderByCalificacionDescFechaDesc(Long idCancha);
+
+// Obtener comentarios por cancha y calificación
+List<Comentario> findByCancha_IdCanchaAndCalificacion(Long idCancha, Integer calificacion);
+
+// Obtener comentarios por cancha y cliente
+List<Comentario> findByCancha_IdCanchaAndPersona_Id(Long idCancha, Long personaId);
 
     
 }
