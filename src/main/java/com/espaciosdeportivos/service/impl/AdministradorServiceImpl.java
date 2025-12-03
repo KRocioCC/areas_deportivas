@@ -4,13 +4,19 @@ import com.espaciosdeportivos.dto.AdministradorDTO;
 import com.espaciosdeportivos.dto.ClienteDTO;
 import com.espaciosdeportivos.dto.UsuarioControlDTO;
 import com.espaciosdeportivos.model.Administrador;
+import com.espaciosdeportivos.model.AreaDeportiva;
+import com.espaciosdeportivos.model.Cancha;
 import com.espaciosdeportivos.model.Cliente;
 import com.espaciosdeportivos.model.UsuarioControl;
 import com.espaciosdeportivos.repository.AdministradorRepository;
+import com.espaciosdeportivos.repository.CanchaRepository;
 import com.espaciosdeportivos.repository.ReservaRepository;
 import com.espaciosdeportivos.repository.SupervisaRepository;
 import com.espaciosdeportivos.repository.UsuarioControlRepository;
 import com.espaciosdeportivos.service.AdministradorService;
+import com.espaciosdeportivos.service.ISupervisaService;
+import com.espaciosdeportivos.model.AreaDeportiva;
+import com.espaciosdeportivos.repository.AreaDeportivaRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -30,6 +36,9 @@ public class AdministradorServiceImpl implements AdministradorService {
     private final SupervisaRepository supervisaRepository;
     private final ReservaRepository reservaRepository;
     private final UsuarioControlRepository usuarioControlRepository;
+    private final CanchaRepository canchaRepository; 
+    private final ISupervisaService supervisaService;
+    private final AreaDeportivaRepository areaDeportivaRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -38,12 +47,18 @@ public class AdministradorServiceImpl implements AdministradorService {
         SupervisaRepository supervisaRepository,
         ReservaRepository reservaRepository,
         UsuarioControlRepository usuarioControlRepository,
+        CanchaRepository canchaRepository,
+        ISupervisaService supervisaService,
+        AreaDeportivaRepository areaDeportivaRepository,
         ModelMapper modelMapper
     ) {
         this.administradorRepository = administradorRepository;
         this.supervisaRepository = supervisaRepository;
         this.reservaRepository = reservaRepository;
         this.usuarioControlRepository = usuarioControlRepository;
+        this.canchaRepository = canchaRepository;        // ← Nueva asignación
+        this.supervisaService = supervisaService;  
+        this.areaDeportivaRepository = areaDeportivaRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -240,5 +255,30 @@ public class AdministradorServiceImpl implements AdministradorService {
                 .horaFinTurno(u.getHoraFinTurno())
                 .direccion(u.getDireccion())
                 .build();
+    }
+
+
+    @Override
+    @Transactional
+    public UsuarioControlDTO asignarUsuarioControlExistente(Long idAdmin, Long usuarioControlId) {
+        Administrador admin = administradorRepository.findById(idAdmin)
+            .orElseThrow(() -> new RuntimeException("Administrador no encontrado con ID: " + idAdmin));
+        
+        UsuarioControl usuarioControl = usuarioControlRepository.findById(usuarioControlId)
+            .orElseThrow(() -> new RuntimeException("Usuario de control no encontrado con ID: " + usuarioControlId));
+        
+        AreaDeportiva areaDelAdmin = areaDeportivaRepository.findByAdministrador_Id(idAdmin)
+            .orElseThrow(() -> new RuntimeException("El administrador no tiene un área deportiva asignada"));
+        
+        List<Cancha> canchasDelArea = canchaRepository.findByAreaDeportiva_IdAreaDeportiva(areaDelAdmin.getIdAreaDeportiva());
+        
+        if (canchasDelArea.isEmpty()) {
+            throw new RuntimeException("El área deportiva no tiene canchas disponibles");
+        }
+        
+        Cancha primeraCancha = canchasDelArea.get(0);
+        supervisaService.asignarCanchaASupervisor(usuarioControlId, primeraCancha.getIdCancha());
+        
+        return mapToUsuarioControlDTO(usuarioControl);
     }
 }
