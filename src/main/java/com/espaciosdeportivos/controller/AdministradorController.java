@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.espaciosdeportivos.dto.ClienteDTO;
 import java.time.LocalDate;
@@ -103,6 +104,12 @@ public class AdministradorController {
         return administradorService.crearUsuarioControlParaAdministrador(id, dto);
     }
 
-
+    // Asignar un usuario de control ya existente al administrador (asigna una cancha)
+    @PostMapping("/{id}/usuarios-control/asignar/{usuarioControlId}")
+    public UsuarioControlDTO asignarUsuarioControlExistente(
+            @PathVariable Long id,
+            @PathVariable Long usuarioControlId) {
+        return administradorService.asignarUsuarioControlExistente(id, usuarioControlId);
+    }
 
 }

@@ -49,5 +49,6 @@ public interface AdministradorService {
     UsuarioControlDTO crearUsuarioControlParaAdministrador(Long idAdmin, UsuarioControlDTO dto);
 
 
-
+    // Asignar un usuario de control existente al administrador
+    UsuarioControlDTO asignarUsuarioControlExistente(Long idAdmin, Long usuarioControlId);
 }
