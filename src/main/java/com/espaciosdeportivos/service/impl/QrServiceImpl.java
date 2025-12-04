@@ -374,5 +374,119 @@ public class QrServiceImpl implements IQrService {
         .build();
 }
 
+    @Override
+        public Map<String, Object> validarQrCompleto(String codigoQr) {
+        // Limpiar el código QR (quitar .png si viene)
+        String codigoLimpio = codigoQr.replace(".png", "");
+        
+        // 1. Buscar el QR (intentar con y sin extensión)
+        Qr qr = qrRepository.findByCodigoQrAndEstadoTrue(codigoQr)
+                .or(() -> qrRepository.findByCodigoQrAndEstadoTrue(codigoLimpio))
+                .or(() -> qrRepository.findByCodigoQrAndEstadoTrue(codigoQr + ".png"))
+                .orElse(null);
+        
+        if (qr == null) {
+            return Map.of(
+                "valido", false,
+                "mensaje", "Código QR no encontrado"
+            );
+        }
+        
+                // 2. Validar que esté activo
+                if (!qr.getEstado()) {
+            return Map.of(
+                "valido", false,
+                "mensaje", "QR inactivo o ya fue utilizado"
+            );
+        }
+        
+        // 3. Validar que no haya expirado
+        if (qr.getFechaExpiracion().isBefore(LocalDateTime.now())) {
+            return Map.of(
+                "valido", false,
+                "mensaje", "QR expirado"
+            );
+        }
+        
+        // 4. Validar la reserva
+        Reserva reserva = qr.getReserva();
+        if (reserva == null) {
+            return Map.of(
+                "valido", false,
+                "mensaje", "Reserva no encontrada"
+            );
+        }
+        
+        // 5. Validar fecha de la reserva (solo día, sin restricción de horario)
+        java.time.LocalDate hoy = java.time.LocalDate.now();
+        if (!reserva.getFechaReserva().equals(hoy)) {
+            return Map.of(
+                "valido", false,
+                "mensaje", "Esta reserva no es para hoy",
+                "fechaReserva", reserva.getFechaReserva().toString()
+            );
+        }
+        
+        // 6. Obtener datos de la persona
+        Persona persona = qr.getPersona();
+        String nombreCompleto = persona.getNombre() + " " + 
+                                persona.getApellidoPaterno() + " " + 
+                                (persona.getApellidoMaterno() != null ? persona.getApellidoMaterno() : "");
+        
+        // 7. Obtener datos de la cancha y su capacidad
+        String nombreCancha = reserva.getCancha() != null ? reserva.getCancha().getNombre() : "N/A";
+        Integer capacidad = null;
+        try {
+            capacidad = reserva.getCancha() != null ? reserva.getCancha().getCapacidad() : null;
+        } catch (Exception ignored) {
+            capacidad = null;
+        }
+
+        // 8. Validar contador de escaneos vs capacidad
+        int veces = qr.getVecesEscaneado() != null ? qr.getVecesEscaneado() : 0;
+        if (capacidad != null && veces >= capacidad) {
+            qr.setEstado(false);
+            qrRepository.save(qr);
+            return Map.of(
+                "valido", false,
+                "mensaje", "Se alcanzó la capacidad de la cancha",
+                "nombreCancha", nombreCancha,
+                "capacidad", capacidad,
+                "vecesEscaneado", veces
+            );
+        }
+        
+        // 9. TODO: Registrar la validación (actualizar usuarioControl si lo tienes en contexto)
+        // qr.setUsuarioControl(usuarioControlActual);
+        // qrRepository.save(qr);
+        
+        // 10. Actualizar estado de reserva si está CONFIRMADA
+        if ("CONFIRMADA".equals(reserva.getEstadoReserva()) || "PENDIENTE".equals(reserva.getEstadoReserva())) {
+            reserva.setEstadoReserva("EN_CURSO");
+            reservaRepository.save(reserva);
+        }
+        
+        // 11. Incrementar contador y, si alcanza capacidad, desactivar
+        veces = veces + 1;
+        qr.setVecesEscaneado(veces);
+        if (capacidad != null && veces >= capacidad) {
+            qr.setEstado(false);
+        }
+        qrRepository.save(qr);
+        
+        // 12. Respuesta exitosa
+        return Map.of(
+            "valido", true,
+            "mensaje", "✅ Acceso permitido",
+            "nombrePersona", nombreCompleto,
+            "nombreCancha", nombreCancha,
+            "esCliente", qr.getEsCliente(),
+            "horaInicio", reserva.getHoraInicio().toString(),
+            "horaFin", reserva.getHoraFin().toString(),
+                        "idReserva", reserva.getIdReserva(),
+                        "capacidad", capacidad,
+                        "vecesEscaneado", veces
+        );
+    }
 
 }

@@ -31,6 +31,9 @@ public interface IQrService {
     QrDTO obtenerQrPorCodigo(String codigoqr);
 
     List<QrDTO> obtenerQrsPorPersona(Long idReserva);
+    
+    // Validación completa de QR con todas las verificaciones
+    java.util.Map<String, Object> validarQrCompleto(String codigoQr);
     //List<QrDTO> obtnerQrsDeCliente(Long idCliente);
     //List<QrDTO> obtnerQrDeInvitado(Long idInvitado);
     

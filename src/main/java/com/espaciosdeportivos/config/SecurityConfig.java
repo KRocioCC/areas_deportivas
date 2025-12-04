@@ -122,7 +122,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/reservas/*/eliminar").hasRole("ADMINISTRADOR")
                 
                 // ADMINISTRADOR exclusivo
-                .requestMatchers("/api/supervisa/**").hasRole("ADMINISTRADOR")
+                .requestMatchers("/api/supervisa/**").hasAnyRole("ADMINISTRADOR", "USUARIO_CONTROL") //karen
                 
                 // =============================================
                 //  RUTAS MIXTAS (Múltiples roles)

@@ -39,6 +39,18 @@ public class Qr {
     @Column(name = "es_cliente", nullable = false)
     private Boolean esCliente ;
 
+    // Contador de validaciones de este QR
+    @Builder.Default
+    @Column(name = "veces_escaneado", nullable = false, columnDefinition = "integer not null default 0")
+    private Integer vecesEscaneado = 0;
+
+    @PrePersist
+    public void prePersist() {
+        if (vecesEscaneado == null) {
+            vecesEscaneado = 0;
+        }
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", referencedColumnName = "id_persona", nullable = false)
     private Persona usuarioControl;
