@@ -244,6 +244,17 @@ public class ReservaController {
         return ResponseEntity.ok(reservas);
     }
 
+    // Listar reservas de HOY por cancha (para usuario control)
+    @GetMapping("/cancha/{idCancha}/hoy")
+    public ResponseEntity<List<ReservaDTO>> obtenerReservasDeHoyPorCancha(@PathVariable Long idCancha) {
+        LocalDate hoy = LocalDate.now();
+        List<ReservaDTO> todasReservas = reservaService.listarReservasPorCancha(idCancha);
+        List<ReservaDTO> reservasHoy = todasReservas.stream()
+                .filter(r -> r.getFechaReserva().equals(hoy))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(reservasHoy);
+    }
+
     // Eliminado método duplicado `getPorCliente` para evitar mapeos idénticos.
 
     // Buscar por cliente y estado

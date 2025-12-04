@@ -110,18 +110,32 @@ public class QrController {
         return ResponseEntity.ok(qr);
     }
     
-    //VALIDAR QR
+    //VALIDAR QR (mejorado para usuario control)
     @PostMapping("/validar")
-    public ResponseEntity<Boolean> validarQr(@RequestParam String codigo) {
+    public ResponseEntity<java.util.Map<String, Object>> validarQr(@RequestBody java.util.Map<String, String> request) {
         try {
-            // Aquí puedes implementar la lógica de validación de QR
-            // Por ahora, devolvemos true si existe y está activo
-            List<QrDTO> qrs = qrService.obtenerTodosLosQrs();
-            boolean existe = qrs.stream()
-                    .anyMatch(qr -> qr.getCodigoQr().equals(codigo) && Boolean.TRUE.equals(qr.getEstado()));
-            return ResponseEntity.ok(existe);
+            String codigoQr = request.get("codigo");
+            
+            if (codigoQr == null || codigoQr.isBlank()) {
+                return ResponseEntity.badRequest().body(java.util.Map.of(
+                    "valido", false,
+                    "mensaje", "Código QR no proporcionado"
+                ));
+            }
+            
+            // Obtener usuario control del token (opcional, si quieres validar por cancha asignada)
+            // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            // String username = auth.getName();
+            
+            java.util.Map<String, Object> resultado = qrService.validarQrCompleto(codigoQr);
+            return ResponseEntity.ok(resultado);
+            
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(false);
+            logger.error("[QR] Error al validar QR: {}", e.getMessage());
+            return ResponseEntity.status(500).body(java.util.Map.of(
+                "valido", false,
+                "mensaje", "Error al validar QR: " + e.getMessage()
+            ));
         }
     }
 
