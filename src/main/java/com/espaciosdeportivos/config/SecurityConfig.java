@@ -122,11 +122,17 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/reservas/*/eliminar").hasRole("ADMINISTRADOR")
                 
                 // ADMINISTRADOR exclusivo
-                .requestMatchers("/api/supervisa/**").hasAnyRole("ADMINISTRADOR", "USUARIO_CONTROL") //karen
+                .requestMatchers("/api/supervisa/**").hasAnyRole("ADMINISTRADOR", "USUARIO_CONTROL", "SUPERUSUARIO")
                 
                 // =============================================
                 //  RUTAS MIXTAS (Múltiples roles)
                 // =============================================
+                
+                //k
+                // Reservas - USUARIO_CONTROL necesita ver reservas de sus canchas
+                .requestMatchers(HttpMethod.GET, "/api/reservas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE", "USUARIO_CONTROL")
+                .requestMatchers(HttpMethod.POST, "/api/reservas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
+                .requestMatchers(HttpMethod.PUT, "/api/reservas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
                 
                 .requestMatchers("/api/areasdeportivas/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
                 .requestMatchers("/api/clientes/**").hasAnyRole("SUPERUSUARIO", "ADMINISTRADOR", "CLIENTE")
